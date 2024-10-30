@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom"
-import { RouterUser } from "../pages/user/RouterUser";
-import { RouterPublic } from "../pages/public/RouterPublic";
-import { DesignRouter } from "../pages/design/DesignRouter";
+import { RouterUser } from "./user/RouterUser";
+import { RouterPublic } from "./public/RouterPublic";
+import { DesignRouter } from "./design/DesignRouter";
 
 export const AppRouter = () => {
 
