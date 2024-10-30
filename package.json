@@ -9,9 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
-"gitDeploy": "npm run build && npm run deploy",
-"gitUpdate": "git status && git add . && git commit -m \"Project updated\" && git push origin main:develop",
-"gitPages": "npm run gitUpdate && npm run gitDeploy"
+    "gitDeploy": "npm run build && npm run deploy",
+    "gitUpdate": "git status && git add . && git commit -m \"Project updated\" && git push origin main:develop",
+    "gitPages": "npm run gitUpdate && npm run gitDeploy"
   },
   "dependencies": {
     "react": "^18.3.1",
