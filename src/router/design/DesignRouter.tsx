@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import { DesignLayout } from "../../pages/design/layout/DesignLayout"
 import { DesignTopbar } from "../../pages/design/layout/DesignTopbar"
-import { DesignButton } from "@/pages/design/components/DesignButton"
+import { Design } from "@/pages/design/components/Design"
 
 export const DesignRouter = () => {
     return (
@@ -9,9 +9,12 @@ export const DesignRouter = () => {
 
             <DesignTopbar />
             <DesignLayout>
+
                 <Routes>
-                    <Route path="buttons" element={<DesignButton />} />
+                    <Route path="/:title" element={<Design />} />
                 </Routes>
+
+
             </DesignLayout>
 
 

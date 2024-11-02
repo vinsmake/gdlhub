@@ -45,8 +45,6 @@ export const DesignSidebar = () => {
                         </SidebarGroup>
                     ))
                 }
-
-
             </SidebarContent>
         </Sidebar>
     )
