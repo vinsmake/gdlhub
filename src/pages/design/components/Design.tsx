@@ -1,5 +1,23 @@
 import { useParams, Navigate } from "react-router-dom";
+import "../design.css"
 import { DesignButtons } from '../components'; //index.ts
+
+/* 
+NOTA: Este componente toma componentes del index.ts y se mapean en componentMap, de manera que al crear un nuevo componente, este debe ser agregado al mapeo. si nosotros tenemos por ejemplo buttons: DesignButtons, la web sera /design/buttons, en el data.ts que se encuentra en design/layout/data.ts encontramos DesignSidebarData, que contiene todos los datos de creacion del router.
+
+si tenemos por ejemplo:
+
+{
+    title: "buttons",
+    icon: Power,
+},
+
+Entonces designSidebar.tsx creara /design/Buttons
+
+Mientras que este archivo (Design.tsx) creara el componente dentro de /buttons/, mediante componentMap utilizando buttons: DesignButtons,
+
+*/
+
 
 // typing
 type ComponentMap = {
@@ -20,15 +38,14 @@ export const Design = () => {
         ? componentMap[title.toLowerCase()] 
         : null; // Si no existe, se asigna null
 
-    // Redirige si el componente no existe
+    // Redirige si el componente existe
     if (!ComponentToRender) {
         return <Navigate to='/design' />; // Cambia '/not-found' a la ruta que desees
     }
 
+    /* Renderiza el componente correspondiente */
     return (
-        <div>
-            <h2>Design</h2>
-            {/* Renderiza el componente correspondiente */}
+        <div className="design">
             <ComponentToRender />
         </div>
     );

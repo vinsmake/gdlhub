@@ -34,7 +34,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
@@ -47,7 +47,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Composite Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
@@ -60,7 +60,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Layout Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
@@ -73,7 +73,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Page Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
