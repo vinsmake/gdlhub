@@ -14,7 +14,7 @@ export interface DesignSidebarData {
 }
 
 // Define los datos con los tipos
-import { Power, ChefHat } from "lucide-react"
+import { Power, ChefHat, Tag } from "lucide-react"
 export const DesignSidebarData: DesignSidebarData = {
     groups: [
         {
@@ -34,12 +34,12 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
-                    title: "Icons",
-                    icon: ChefHat,
+                    title: "badges",
+                    icon: Tag,
                 },
             ]
         },
@@ -47,7 +47,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Composite Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
@@ -60,7 +60,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Layout Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
@@ -73,7 +73,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Page Components',
             items: [
                 {
-                    title: "Buttons",
+                    title: "buttons",
                     icon: Power,
                 },
                 {
