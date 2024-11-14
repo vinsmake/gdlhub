@@ -47,7 +47,7 @@ export const DesignSidebarData: DesignSidebarData = {
             name: 'Composite Components',
             items: [
                 {
-                    title: "buttons",
+                    title: "carousel",
                     icon: Power,
                 },
                 {

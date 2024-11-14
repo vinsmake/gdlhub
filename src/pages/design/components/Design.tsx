@@ -1,6 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import "../design.css"
-import { DesignBadges, DesignButtons } from '../components'; //index.ts
+import { DesignBadges, DesignButtons, DesignCarousel } from '../components'; //index.ts
 
 /* 
 NOTA: Este componente toma componentes del index.ts y se mapean en componentMap, de manera que al crear un nuevo componente, este debe ser agregado al mapeo. si nosotros tenemos por ejemplo buttons: DesignButtons, la web sera /design/buttons, en el data.ts que se encuentra en design/layout/data.ts encontramos DesignSidebarData, que contiene todos los datos de creacion del router.
@@ -28,6 +28,7 @@ type ComponentMap = {
 const componentMap: ComponentMap = {
     buttons: DesignButtons,
     badges: DesignBadges,
+    carousel: DesignCarousel,
 };
 
 export const Design = () => {

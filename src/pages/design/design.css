@@ -2,6 +2,6 @@
     padding: 4rem;
 }
 
-.design *{
+.design > * {
     margin: 1rem;
 }
