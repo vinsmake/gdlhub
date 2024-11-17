@@ -5,14 +5,22 @@ import { DesignRouter } from "./design/DesignRouter";
 
 export const AppRouter = () => {
 
-
+    // con esto podemos acceder al router a utilizar
+    const authenticated = false;
 
     return (
         <>
             <Routes>
-                <Route path="/" element={<RouterUser />} />
-                <Route path="/" element={<RouterPublic />} />
-                {/* Rutas accesibles para todos los usuarios */}
+
+
+                {
+                    // Aquí utilizamos diferente ruta segun la autenticacion del usuario.
+                    authenticated ? (
+                        <Route path="/*" element={<RouterUser />} />
+                    ) : (
+                        <Route path="/*" element={<RouterPublic />} />
+                    )
+                }
                 <Route path="/design/*" element={<DesignRouter />} />
             </Routes>
         </>
