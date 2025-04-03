@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  gdlhub.app:
+  gdlhub-app:
     build:
       context: ./gdlhub-app
       args:
@@ -27,14 +27,16 @@ services:
         - MODE=${MODE}
     environment:
       - MODE=${MODE}
+      - APIPORT=${APIPORT}
     volumes:
       - ./gdlhub-api:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "${APIPORT}:${APIPORT}"
     command: >
       sh -c "if [ \"$MODE\" = 'production' ]; then
                npm start;
              else
                npm run dev;
              fi"
+
