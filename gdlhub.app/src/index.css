@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+* {
+    @apply box-border;
+}
+
+.color--bg-neutral-900 {
+    @apply bg-neutral-900 text-white
+}
+
+.color--bg-neutral-800 {
+    @apply bg-neutral-800 text-white
+}
+
+.nav__link {
+    @apply hover:bg-neutral-600 text-white
+}
+
+.nav__link--active {
+    @apply bg-red-800 text-white hover:bg-red-800;
+}
+
+.color--primary {
+    @apply bg-red-800 text-white;
+}
+
