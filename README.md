@@ -8,6 +8,8 @@
 - `docker compose up --build -d`
 - `docker compose down`
 
+De manera local, Vite correra en `http://localhost:5173/` mientras que API correra en `http://localhost:3000/`
+
 ## Producción
 
 - `MODE=production`
