@@ -3,13 +3,13 @@ version: '3.9'
 services:
   gdlhub.app:
     build:
-      context: ./gdlhub.app
+      context: ./gdlhub-app
       args:
         - MODE=${MODE}
     environment:
       - MODE=${MODE}
     volumes:
-      - ./gdlhub.app:/app
+      - ./gdlhub-app:/app
       - /app/node_modules
     ports:
       - "5173:5173"
@@ -20,15 +20,15 @@ services:
                npm run dev;
              fi"
 
-  gdlhub.api:
+  gdlhub-api:
     build:
-      context: ./gdlhub.api
+      context: ./gdlhub-api
       args:
         - MODE=${MODE}
     environment:
       - MODE=${MODE}
     volumes:
-      - ./gdlhub.api:/app
+      - ./gdlhub-api:/app
       - /app/node_modules
     ports:
       - "3000:3000"
