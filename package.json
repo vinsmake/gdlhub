@@ -1,0 +1,28 @@
+{
+  "name": "gdlhub",
+  "version": "1.0.0",
+  "description": "- Node `22.13.1`",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+
+    "install-back": "cd gdlhub.api && npm install",
+
+    "install-front": "cd gdlhub.app && npm install",
+    "build-front": "cd gdlhub.app && npm run build",
+    "move-to-docs": "rmdir /S /Q docs && mkdir docs && xcopy gdlhub.app\\dist docs /E /I /Y",
+    "gitUpdate": "git status && git add . && git commit -m \"Project updated\" && git push origin main",
+    "gitPages": "npm run build-front && npm run move-to-docs && npm run gitUpdate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinsmake/gdlhub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vinsmake/gdlhub/issues"
+  },
+  "homepage": "https://github.com/vinsmake/gdlhub#readme"
+}
