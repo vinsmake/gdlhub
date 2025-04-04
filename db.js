@@ -11,3 +11,4 @@ export const pool = new pg.Pool({
 pool.query('SELECT NOW()').then(result => {
     console.log(result);
 })
+
