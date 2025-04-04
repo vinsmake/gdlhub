@@ -18,3 +18,6 @@ De manera local, Vite correra en `http://localhost:5173/` mientras que API corre
 
 ## Database
 - `docker exec -it gdlhub-postgres psql -U ${DB_USER} -d ${DB_NAME}`
+
+## Ver logs de API
+- `docker compose logs -f gdlhub-api`
