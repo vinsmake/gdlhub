@@ -5,20 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-
     "install-back": "cd gdlhub.api && npm install",
-
     "install-front": "cd gdlhub-app && npm install",
     "build-front": "cd gdlhub-app && npm run build",
     "move-to-docs": "rmdir /S /Q docs && mkdir docs && xcopy gdlhub-app\\dist docs /E /I /Y",
     "gitUpdate": "git status && git add . && git commit -m \"Project updated to Github Pages\" && git push origin main",
     "gitPages": "npm run build-front && npm run move-to-docs && npm run gitUpdate",
-
     "dev:app": "cd gdlhub-app && npm run dev",
     "dev:api": "cd gdlhub-api && npm run dev",
-
-    "db:backup": "docker exec gdlhub-postgres pg_dump -U gdlhub -d gdlhub_db > ./backups/backup_$(date +%Y%m%d_%H%M%S).sql",
-    "db:restore": "cat ./backups/backup.sql | docker exec -i gdlhub-postgres psql -U gdlhub -d gdlhub_db"
+    "compose:up:build": "docker compose up --build -d",
+    "db:backup": "docker exec gdlhub-postgres pg_dump -U gdlhub -d gdlhub_db > ./backups/backup_gdlhub.sql",
+    "db:restore": "docker exec -i gdlhub-postgres psql -U gdlhub -d gdlhub_db < ./backups/backup_gdlhub.sql",
+    "db:backup:all": "docker exec gdlhub-postgres pg_dumpall -U gdlhub > ./backups/full_backup_all.sql",
+    "db:restore:all": "docker exec -i gdlhub-postgres psql -U gdlhub -d postgres < ./backups/full_backup_all.sql",
+    "help": "node -e \"console.log(\\\"\\n🛠 COMANDOS DISPONIBLES (npm run)\\n\\ncompose:up:build → Levanta todos los contenedores en modo detached (--build).\\ndb:backup → Backup de gdlhub_db guardado en ./backups/backup_gdlhub.sql\\ndb:restore → Restaura gdlhub_db desde ./backups/backup_gdlhub.sql\\ndb:backup:all → Backup completo de todas las bases guardado en ./backups/full_backup_all.sql\\ndb:restore:all → Restaura todas las bases desde ./backups/full_backup_all.sql\\\")\""
   },
   "repository": {
     "type": "git",

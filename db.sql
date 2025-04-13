@@ -1,5 +1,17 @@
+-- This script creates a PostgreSQL database and a table named 'users' with some sample data.
 CREATE DATABASE nodepg;
 
+-- List all databases to confirm the creation of 'nodepg' 
+\l
+
+-- Connect to the newly created database
+-- NOTE: Only run this command in the psql shell, not in a script.
+\c nodepg
+
+-- List all tables in the current database to confirm the connection
+\dt
+
+-- Create a table named 'users' with the following columns:
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -7,8 +19,11 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Insert some sample data into the 'users' table
 INSERT INTO users (name, email) 
-    VALUES ('John Doe', 'john@gmail.com'), 
-    ('Jane Doe', 'jane@gmail.com');
+VALUES 
+  ('John Doe', 'john@gmail.com'), 
+  ('Jane Doe', 'jane@gmail.com');
 
+-- Select all records from the 'users' table to verify the data insertion
 SELECT * FROM users;
