@@ -14,6 +14,7 @@
     "dev:app": "cd gdlhub-app && npm run dev",
     "dev:api": "cd gdlhub-api && npm run dev",
     "compose:up:build": "docker compose up --build -d",
+    "db:access": "docker exec -it gdlhub-postgres psql -U gdlhub -d postgres",
     "db:backup": "docker exec gdlhub-postgres pg_dump -U gdlhub -d gdlhub_db > ./backups/backup_gdlhub.sql",
     "db:restore": "docker exec -i gdlhub-postgres psql -U gdlhub -d gdlhub_db < ./backups/backup_gdlhub.sql",
     "db:backup:all": "docker exec gdlhub-postgres pg_dumpall -U gdlhub > ./backups/full_backup_all.sql",
