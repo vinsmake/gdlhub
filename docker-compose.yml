@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   gdlhub-app:
+    container_name: gdlhub-app
     build:
       context: ./gdlhub-app
       args:
@@ -21,6 +22,7 @@ services:
              fi"
 
   gdlhub-api:
+    container_name: gdlhub-api
     build:
       context: ./gdlhub-api
       args:
@@ -48,8 +50,8 @@ services:
              fi"
 
   gdlhub-postgres:
-    image: postgres:16
     container_name: gdlhub-postgres
+    image: postgres:16
     restart: always
     ports:
       - "5432:5432"
@@ -58,4 +60,8 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+      - ./backups:/backups
+
+volumes:
+  postgres-data:

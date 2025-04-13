@@ -15,7 +15,10 @@
     "gitPages": "npm run build-front && npm run move-to-docs && npm run gitUpdate",
 
     "dev:app": "cd gdlhub-app && npm run dev",
-    "dev:api": "cd gdlhub-api && npm run dev"
+    "dev:api": "cd gdlhub-api && npm run dev",
+
+    "db:backup": "docker exec gdlhub-postgres pg_dump -U gdlhub -d gdlhub_db > ./backups/backup_$(date +%Y%m%d_%H%M%S).sql",
+    "db:restore": "cat ./backups/backup.sql | docker exec -i gdlhub-postgres psql -U gdlhub -d gdlhub_db"
   },
   "repository": {
     "type": "git",
