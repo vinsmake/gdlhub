@@ -18,7 +18,6 @@ router.get("/users/:uid", async (req, res) => {
         return res.status(404).json({ message: "User not found" });
     }
     res.json(rows);
-
 });
 
 /* Create user */
@@ -27,8 +26,16 @@ router.post("/users", (req, res) => {
 });
 
 /* Delete user */
-router.delete("/users/:uid", (req, res) => {
-    res.send("Deleting user by id: " + req.params.uid);
+router.delete("/users/:uid", async (req, res) => {
+    const { uid } = req.params;
+    const {rows, rowCount} = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [uid]);
+
+    console.log(rows);
+
+    if (rowCount === 0) {
+        return res.status(404).json({ message: "User not found" });
+    }
+    return res.json({message: "User deleted"});
 });
 
 /* Put users */
