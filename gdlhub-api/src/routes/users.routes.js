@@ -6,10 +6,8 @@ const router = Router();
 /* Routes */
 /* Get users */
 router.get("/users", async (req, res) => {
-    const result = await pool.query("SELECT * FROM users")
-    console.log(result);
-    
-    res.send("Getting users");
+    const {rows} = await pool.query("SELECT * FROM users")    
+    res.json(rows);
 });
 
 /* Get users by id */
