@@ -203,6 +203,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 COPY public.users (id, name, email, created_at) FROM stdin;
 1	John Doe	john@gmail.com	2025-04-13 16:26:09.244348
 2	Jane Doe	jane@gmail.com	2025-04-13 16:26:09.244348
+3	vinsmake	ps.enrique.e@gmail.com	2025-04-14 21:13:49.309573
 \.
 
 
@@ -210,7 +211,7 @@ COPY public.users (id, name, email, created_at) FROM stdin;
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: gdlhub
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 2, true);
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --

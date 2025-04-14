@@ -28,3 +28,11 @@ O, con ambiente podemos acceder directamente:
 
 ## Reiniciar en segundo plano
 - `docker compose up --build -d gdlhub-api`
+
+## API
+### Ejemplo de POST
+{
+    "name": "vinsmake",
+    "email": "ps.enrique.e@gmail.com"
+}
+

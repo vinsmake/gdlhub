@@ -21,8 +21,10 @@ router.get("/users/:uid", async (req, res) => {
 });
 
 /* Create user */
-router.post("/users", (req, res) => {
-    res.send("Posting users");
+router.post("/users", async (req, res) => {
+    const data = req.body;
+    const {rows} = await pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [data.name, data.email]);
+    return res.json(rows[0]);
 });
 
 /* Delete user */
