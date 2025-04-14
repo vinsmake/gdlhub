@@ -17,7 +17,7 @@ router.get("/users/:uid", async (req, res) => {
     if (rows.length === 0) {
         return res.status(404).json({ message: "User not found" });
     }
-    res.json(rows);
+    res.json(rows[0]);
 });
 
 /* Create user */
@@ -32,18 +32,19 @@ router.delete("/users/:uid", async (req, res) => {
     const { uid } = req.params;
     const {rows, rowCount} = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [uid]);
 
-    console.log(rows);
-
     if (rowCount === 0) {
         return res.status(404).json({ message: "User not found" });
     }
-    return res.json({message: "User deleted"});
+
+    return res.sendStatus(204);
 });
 
 /* Put users */
-router.put("/users/:uid", (req, res) => {
+router.put("/users/:uid", async (req, res) => {
     const { uid } = req.params;
-    res.send("Putting user by id " + req.params.uid);
+    const data = req.body;
+    const result = await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [data.name, data.email, uid]);
+    res.send("actualizando usuario con id: " + uid);
 });
 
 

@@ -12,7 +12,7 @@ SET standard_conforming_strings = on;
 --
 
 CREATE ROLE gdlhub;
-ALTER ROLE gdlhub WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:Z/c7OxmFlMW44LRM02HWWw==$pG1wcp+4CNZTg3OIl9ctNRLN2gp43MHYIS+rRHZTII8=:oFrwI0+F7O2ryAlkxnXwQcMZpPG3M6Sy/xSrg2z4Okk=';
+ALTER ROLE gdlhub WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'SCRAM-SHA-256$4096:i4Qw947NHHQNWgp0cHkDcQ==$ymxPPai0tFEj3eu4hZInj7hLUw1ULoAdbVXO86Nw2WU=:ORBAj6rkHSKqu0qoZRcawXkdpjtDtOQ0F5gkIzS0AO4=';
 
 --
 -- User Configurations
@@ -41,54 +41,6 @@ ALTER ROLE gdlhub WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION B
 
 -- Dumped from database version 16.8 (Debian 16.8-1.pgdg120+1)
 -- Dumped by pg_dump version 16.8 (Debian 16.8-1.pgdg120+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- PostgreSQL database dump complete
---
-
---
--- Database "gdlhub_db" dump
---
-
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 16.8 (Debian 16.8-1.pgdg120+1)
--- Dumped by pg_dump version 16.8 (Debian 16.8-1.pgdg120+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: gdlhub_db; Type: DATABASE; Schema: -; Owner: gdlhub
---
-
-CREATE DATABASE gdlhub_db WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
-
-
-ALTER DATABASE gdlhub_db OWNER TO gdlhub;
-
-\connect gdlhub_db
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -201,9 +153,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.users (id, name, email, created_at) FROM stdin;
-1	John Doe	john@gmail.com	2025-04-13 16:26:09.244348
-2	Jane Doe	jane@gmail.com	2025-04-13 16:26:09.244348
-3	vinsmake	ps.enrique.e@gmail.com	2025-04-14 21:13:49.309573
+1	John Doe	john@gmail.com	2025-04-14 21:57:37.032908
+2	Jane Doe	jane@gmail.com	2025-04-14 21:57:37.032908
 \.
 
 
@@ -211,7 +162,7 @@ COPY public.users (id, name, email, created_at) FROM stdin;
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: gdlhub
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 3, true);
+SELECT pg_catalog.setval('public.users_id_seq', 2, true);
 
 
 --
