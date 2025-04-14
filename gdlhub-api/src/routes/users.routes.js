@@ -5,7 +5,10 @@ const router = Router();
 
 /* Routes */
 /* Get users */
-router.get("/users", (req, res) => {
+router.get("/users", async (req, res) => {
+    const result = await pool.query("SELECT * FROM users")
+    console.log(result);
+    
     res.send("Getting users");
 });
 
@@ -28,7 +31,7 @@ router.delete("/users/:uid", (req, res) => {
 /* Put users */
 router.put("/users/:uid", (req, res) => {
     const { uid } = req.params;
-    res.send("Updating users by id:" + req.params.uid);
+    res.send("Putting user by id " + req.params.uid);
 });
 
 
