@@ -26,5 +26,5 @@ O, con ambiente podemos acceder directamente:
 - `db:backup`
 - `db:restore`
 
-## Ver logs de API
-- `docker compose logs -f gdlhub-api`
+## Reiniciar en segundo plano
+- `docker compose up --build -d gdlhub-api`

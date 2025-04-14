@@ -11,9 +11,14 @@ router.get("/users", async (req, res) => {
 });
 
 /* Get users by id */
-router.get("/users/:uid", (req, res) => {
+router.get("/users/:uid", async (req, res) => {
     const { uid } = req.params;
-    res.send("Getting user by id: " + uid);
+    const {rows} = await pool.query('SELECT * FROM users WHERE id = $1', [uid]);
+    if (rows.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+    }
+    res.json(rows);
+
 });
 
 /* Create user */
