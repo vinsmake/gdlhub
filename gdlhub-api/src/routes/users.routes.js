@@ -10,9 +10,9 @@ router.get("/users", (req, res) => {
 });
 
 /* Get users by id */
-router.get("/users/:UserId", (req, res) => {
-    const { UserId } = req.params;
-    res.send("Getting user by id: " + UserId);
+router.get("/users/:uid", (req, res) => {
+    const { uid } = req.params;
+    res.send("Getting user by id: " + uid);
 });
 
 /* Create user */
@@ -21,14 +21,14 @@ router.post("/users", (req, res) => {
 });
 
 /* Delete user */
-router.delete("/users/:UserId", (req, res) => {
-    res.send("Deleting user by id: " + req.params.UserId);
+router.delete("/users/:uid", (req, res) => {
+    res.send("Deleting user by id: " + req.params.uid);
 });
 
 /* Put users */
-router.put("/users/:UserId", (req, res) => {
-    const { UserId } = req.params;
-    res.send("Putting users " + req.params.UserId);
+router.put("/users/:uid", (req, res) => {
+    const { uid } = req.params;
+    res.send("Updating users by id:" + req.params.uid);
 });
 
 

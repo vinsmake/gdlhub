@@ -43,7 +43,8 @@ services:
     depends_on:
       - gdlhub-postgres
     command: >
-      sh -c "if [ \"$MODE\" = 'production' ]; then
+      sh -c "npm install &&
+             if [ \"$MODE\" = 'production' ]; then
                npm start;
              else
                npm run dev;
