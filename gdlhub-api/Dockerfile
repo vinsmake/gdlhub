@@ -7,8 +7,5 @@ ARG MODE
 ENV MODE=$MODE
 
 COPY package*.json ./
-RUN npm install
 
 COPY . .
-
-CMD [ "npm", "run", "dev" ]

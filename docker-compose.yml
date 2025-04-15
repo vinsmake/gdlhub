@@ -15,11 +15,13 @@ services:
     ports:
       - "5173:5173"
     command: >
-      sh -c "if [ \"$MODE\" = 'production' ]; then
+      sh -c "npm install &&
+             if [ \"$MODE\" = 'production' ]; then
                npm run build && npm run preview -- --host;
              else
                npm run dev;
              fi"
+
 
   gdlhub-api:
     container_name: gdlhub-api
