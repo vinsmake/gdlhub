@@ -14,12 +14,12 @@ export default defineConfig({
       '@common': path.resolve(__dirname, './src/components/common'),
     },
   },
-  base: "/",
+  base: "/gdlhub/",
   server: {
     host: true,
     watch: {
       usePolling: true,
-      interval: 100, // opcional: menor intervalo = mayor sensibilidad
+      interval: 100,
     },
   },
 })
