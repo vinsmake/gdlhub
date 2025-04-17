@@ -14,7 +14,7 @@ export default defineConfig({
       '@common': path.resolve(__dirname, './src/components/common'),
     },
   },
-  base: "https://gdlhub.app/",
+  base: "/",
   server: {
     host: true,
     watch: {

@@ -8,6 +8,7 @@
     "install-back": "cd gdlhub.api && npm install",
     "install-front": "cd gdlhub-app && npm install",
     "build-front": "cd gdlhub-app && npm run build",
+    "deploy-front": "npm run build-front && gh-pages -d gdlhub-app/dist",
     "move-to-docs": "rmdir /S /Q docs && mkdir docs && xcopy gdlhub-app\\dist docs /E /I /Y",
     "gitUpdate": "git status && git add . && git commit -m \"Project updated to Github Pages\" && git push origin main",
     "gitPages": "npm run build-front && npm run move-to-docs && npm run gitUpdate",
@@ -31,5 +32,8 @@
   "bugs": {
     "url": "https://github.com/vinsmake/gdlhub/issues"
   },
-  "homepage": "https://github.com/vinsmake/gdlhub#readme"
+  "homepage": "https://github.com/vinsmake/gdlhub#readme",
+  "dependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }
