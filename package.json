@@ -9,7 +9,6 @@
     "install-front": "cd gdlhub-app && npm install",
     "build-front": "cd gdlhub-app && npm run build",
     "deploy-front": "npm run build-front && gh-pages -d gdlhub-app/dist",
-    "move-to-docs": "rmdir /S /Q docs && mkdir docs && xcopy gdlhub-app\\dist docs /E /I /Y",
     "gitUpdate": "git status && git add . && git commit -m \"Project updated to Github Pages\" && git push origin main",
     "dev:app": "cd gdlhub-app && npm run dev",
     "dev:api": "cd gdlhub-api && npm run dev",
