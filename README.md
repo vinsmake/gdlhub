@@ -18,7 +18,7 @@ De manera local, Vite correra en `http://localhost:5173/` mientras que API corre
 
 ## Database
 ### Para conectarse a la database
-- `docker exec -it gdlhub-postgres psql -U gdlhub -d postgres`
+- `docker exec -it gdlhub-postgres psql -U gdlhub -d gdlhub_db`
 O, con ambiente podemos acceder directamente:
 - `docker exec -it gdlhub-postgres psql -U ${DB_USER} -d ${DB_NAME}`
 

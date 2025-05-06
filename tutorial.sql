@@ -1,12 +1,12 @@
 -- This script creates a PostgreSQL database and a table named 'users' with some sample data.
-CREATE DATABASE gdlhub_restaurants;
+CREATE DATABASE gdlhub_db;
 
 -- List all databases to confirm the creation of 'gdlhub_restaurants' 
 \l
 
 -- Connect to the newly created database
 -- NOTE: Only run this command in the psql shell, not in a script.
-\c gdlhub_restaurants
+\c gdlhub_db
 
 -- List all tables in the current database to confirm the connection
 \dt
@@ -26,4 +26,6 @@ VALUES
   ('Jane Doe', 'jane@gmail.com');
 
 -- Select all records from the 'users' table to verify the data insertion
+\dt             -- Ver tablas
 SELECT * FROM users;
+SELECT * FROM restaurants;
