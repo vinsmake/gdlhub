@@ -24,4 +24,4 @@ VALUES
 INSERT INTO restaurants (name, description, address)
 VALUES 
   ('Tacos El Güero', 'Tacos al pastor y bistec', 'Av. Patria 234'),
-  ('Mariscos El Chapo', 'Cocteles y ceviches', 'Calle Marlin 12');
+  ('Mariscos El Capo', 'Cocteles y ceviches', 'Calle Marlin 12');
