@@ -1,4 +1,5 @@
 import { RestaurantsList } from "../pages/RestaurantsPage";
+import { Outlet } from "react-router-dom";
 
 export const DashboardMain = ({ children }) => {
   return (
@@ -6,6 +7,7 @@ export const DashboardMain = ({ children }) => {
       {children}
       hasta este punto, esta funcionando
       <RestaurantsList />
+      <Outlet />
     </div>
   );
 };
