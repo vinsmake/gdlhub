@@ -1,12 +1,12 @@
 -- This script creates a PostgreSQL database and a table named 'users' with some sample data.
-CREATE DATABASE nodepg;
+CREATE DATABASE gdlhub_restaurants;
 
--- List all databases to confirm the creation of 'nodepg' 
+-- List all databases to confirm the creation of 'gdlhub_restaurants' 
 \l
 
 -- Connect to the newly created database
 -- NOTE: Only run this command in the psql shell, not in a script.
-\c nodepg
+\c gdlhub_restaurants
 
 -- List all tables in the current database to confirm the connection
 \dt
