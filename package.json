@@ -17,8 +17,8 @@
     "db:restore": "docker exec -i gdlhub-postgres psql -U gdlhub -d gdlhub_db < ./backups/backup_gdlhub.sql",
     "db:backup:all": "docker exec gdlhub-postgres pg_dumpall -U gdlhub > ./backups/full_backup_all.sql",
     "db:restore:all": "docker exec -i gdlhub-postgres psql -U gdlhub -d postgres < ./backups/full_backup_all.sql",
-    "db:restore:fresh": "docker compose down -v && docker compose up --build -d",
-    "dockercompose:up:build": "docker compose up --build -d",
+    "dockercompose:rebuild": "docker-compose down --volumes --rmi all && docker compose up --build -d",
+    "dockercompose:build": "docker compose up --build -d",
     "help": "node -e \"console.log(\\\"\\n🛠 COMANDOS DISPONIBLES (npm run)\\n\\ncompose:up:build → Levanta todos los contenedores en modo detached (--build).\\ndb:backup → Backup de gdlhub_db guardado en ./backups/backup_gdlhub.sql\\ndb:restore → Restaura gdlhub_db desde ./backups/backup_gdlhub.sql\\ndb:backup:all → Backup completo de todas las bases guardado en ./backups/full_backup_all.sql\\ndb:restore:all → Restaura todas las bases desde ./backups/full_backup_all.sql\\ndb:restore:fresh → Para restaurar un entorno desde cero, carga init.sql\\\")\""
   },
   "repository": {
