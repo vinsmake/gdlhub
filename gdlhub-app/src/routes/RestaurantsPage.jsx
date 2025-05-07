@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, Link } from "react-router-dom";
 
 export default function RestaurantsPage() {
   const restaurants = useLoaderData();
@@ -10,7 +10,7 @@ export default function RestaurantsPage() {
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {restaurants.map((r) => (
-          <div key={r.id} className="bg-neutral-700 p-4 rounded-2xl shadow-lg space-y-3">
+          <Link to={`/restaurants/${r.id}`} key={r.id} className="bg-neutral-700 p-4 rounded-2xl shadow-lg space-y-3 hover:bg-neutral-600 transition-colors">
             <h2 className="text-2xl font-semibold text-white">{r.name}</h2>
             <p className="text-sm text-gray-300">{r.description}</p>
             <p className="text-sm text-gray-400">{r.address}</p>
@@ -26,7 +26,7 @@ export default function RestaurantsPage() {
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

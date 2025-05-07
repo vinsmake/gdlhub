@@ -1,4 +1,3 @@
-import { RestaurantsList } from "../pages/RestaurantsPage";
 import { Outlet } from "react-router-dom";
 
 export const DashboardMain = ({ children }) => {
