@@ -14,7 +14,7 @@ const { Sidebar } = data;
 
 export const DashboardSidebar = () => {
     return (
-        <aside className="sticky top-4 self-start w-1/5 rounded-xl p-4 text-lg">
+        <aside className="sticky top-4 self-start w-1/5 rounded-xl p-4 text-lg text-white">
 
             {/* Logo + título */}
             <div className="flex items-center gap-3 mb-6">
