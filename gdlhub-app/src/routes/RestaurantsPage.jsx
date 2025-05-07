@@ -7,7 +7,7 @@ export default function RestaurantsPage() {
       <h1>Restaurantes</h1>
       <ul>
         {restaurants.map(r => (
-          <li key={r.id}>{r.name} - {r.location}</li>
+          <li key={r.id}>{r.name} - {r.address} - {r.maps}</li>
         ))}
       </ul>
     </div>
