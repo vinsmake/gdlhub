@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
+  avatar VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -16,12 +17,20 @@ CREATE TABLE IF NOT EXISTS restaurants (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Datos de prueba
-INSERT INTO users (name, email)
+-- Datos de prueba para usuarios con imagen
+INSERT INTO users (name, email, avatar)
 VALUES 
-  ('John Doe', 'john@gmail.com'),
-  ('Jane Doe', 'jane@gmail.com');
+  ('Usuario 1', 'user1@example.com', 'pc1.jpg'),
+  ('Usuario 2', 'user2@example.com', 'pc2.jpg'),
+  ('Usuario 3', 'user3@example.com', 'pc3.jpg'),
+  ('Usuario 4', 'user4@example.com', 'pc4.jpg'),
+  ('Usuario 5', 'user5@example.com', 'pc5.jpg'),
+  ('Usuario 6', 'user6@example.com', 'pc6.jpg'),
+  ('Usuario 7', 'user7@example.com', 'pc7.jpg'),
+  ('Usuario 8', 'user8@example.com', 'pc8.jpg'),
+  ('Usuario 9', 'user9@example.com', 'pc9.jpg');
 
+-- Datos de prueba para restaurantes
 INSERT INTO restaurants (name, description, address, maps)
 VALUES 
   ('La Antigua Waffles', 'Waffles, chilaquiles, huevos y cafe', 'Calle Prisciliano Sánchez 1003, Col Americana, Americana, 44160 Guadalajara, Jal.', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.925599103906!2d-103.36371532390382!3d20.67260569991436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ae024e19f1af%3A0x400e571a57c7efba!2sLa%20Antigua%20Waffles!5e0!3m2!1ses-419!2smx!4v1746637410380!5m2!1ses-419!2smx'),
@@ -33,5 +42,3 @@ VALUES
   ('En Punto. Barra de Café', 'Café de especialidad, repostería y espacio minimalista', 'C. Juan Ruiz de Alarcón 211, Col Americana, Obrera, 44140 Guadalajara, Jal.', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.964164061814!2d-103.3808608353138!3d20.671036892853262!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ae0c2090ccad%3A0xf046784f89bb440f!2sEn%20Punto.%20Barra%20de%20Caf%C3%A9!5e0!3m2!1ses-419!2smx!4v1746641095076!5m2!1ses-419!2smx'),
   ('Espacio Abierto', 'Cafetería artística con mobiliario compartido y relajado', 'C. Simón Bolívar 320, Col Americana, Obrera, 44140 Guadalajara, Jal.', 'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3732.9376383166427!2d-103.37236290021342!3d20.672115961778882!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428af07cf001fe9%3A0x38122fe76e32a3a7!2sEspacio%20Abierto!5e0!3m2!1ses-419!2smx!4v1746641117615!5m2!1ses-419!2smx'),
   ('Como si fuera Domingo', 'Desayunos lentos, pan artesanal y ambiente nostálgico', 'C. Manuel López Cotilla 1476, Col Americana, Arcos Vallarta, 44150 Guadalajara, Jal.', 'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3732.9376383166427!2d-103.37236290021342!3d20.672115961778882!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428ae056edcce37%3A0x15dcf2a2c25b977d!2sComo%20si%20fuera%20Domingo!5e0!3m2!1ses-419!2smx!4v1746641135163!5m2!1ses-419!2smx');
-
-
