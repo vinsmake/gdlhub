@@ -9,7 +9,7 @@ export default function RestaurantsPage() {
         Inicio
       </h1>
 
-<h2 className="text-2xl font-semibold text-white">Seguidos</h2>
+<h2 className="text-2xl font-semibold text-white">Usuarios que sigues</h2>
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
   {users.map((u) => (
     <Link
@@ -24,7 +24,7 @@ export default function RestaurantsPage() {
 </div>
 
 
-      <h2 className="text-2xl font-semibold text-white mt-10">Lista de Restaurantes</h2>
+      <h2 className="text-2xl font-semibold text-white mt-10">Restaurantes que sigues</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {restaurants.map((r) => (
           <Link
