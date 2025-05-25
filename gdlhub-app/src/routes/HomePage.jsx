@@ -15,13 +15,23 @@ export default function RestaurantsPage() {
     <Link
       to={`/users/${u.id}`}
       key={u.id}
-      className="bg-neutral-700 p-4 rounded-2xl shadow-lg space-y-3 hover:bg-neutral-600 transition-colors"
+      className="bg-neutral-700 p-4 rounded-2xl shadow-lg hover:bg-neutral-600 transition-colors"
     >
-      <h2 className="text-2xl font-semibold text-white">{u.name}</h2>
-      <p className="text-sm text-gray-300">{u.email}</p>
+      <div className="flex items-center gap-4">
+        <img
+          src={`http://localhost:3000/img/user/${u.avatar}`}
+          alt={u.name}
+          className="w-16 h-16 rounded-full object-cover"
+        />
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-white">{u.name}</h2>
+          <p className="text-sm text-gray-300">{u.email}</p>
+        </div>
+      </div>
     </Link>
   ))}
 </div>
+
 
 
       <h2 className="text-2xl font-semibold text-white mt-10">Restaurantes que sigues</h2>
