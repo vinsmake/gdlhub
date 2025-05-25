@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+
+/* Logos */
 import {
     Eye,
     Heart,
@@ -24,12 +27,16 @@ export const DashboardSidebar = () => {
 
             {/* Navegación */}
             <nav className="flex flex-col gap-2">
-                <a href="#" className="flex items-center gap-2 nav__link nav__link--active rounded-xl px-3 py-2 transition">
+                <Link to="/" className="flex items-center gap-2 nav__link nav__link--active rounded-xl px-3 py-2 transition">
                     <Home size={24} /> Inicio
-                </a>
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                </Link>
+                <Link
+                    to="/restaurants"
+                    className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition"
+                >
                     <Utensils size={24} /> Restaurantes
-                </a>
+                </Link>
+
                 <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                     <List size={24} /> Categorías
                 </a>
