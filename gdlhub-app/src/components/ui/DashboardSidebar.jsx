@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 /* Logos */
 import {
@@ -28,18 +28,33 @@ export const DashboardSidebar = () => {
 
             {/* Navegación */}
             <nav className="flex flex-col gap-2">
-                <Link to="/" className="flex items-center gap-2 nav__link nav__link--active rounded-xl px-3 py-2 transition">
+                <NavLink
+                    to="/"
+                    className={({ isActive }) =>
+                        `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                    }
+                >
                     <Home size={24} /> Inicio
-                </Link>
-                <Link
+                </NavLink>
+
+                <NavLink
                     to="/restaurants"
-                    className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition"
+                    className={({ isActive }) =>
+                        `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                    }
                 >
                     <Utensils size={24} /> Restaurantes
-                </Link>
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                </NavLink>
+
+                <NavLink
+                    to="/users"
+                    className={({ isActive }) =>
+                        `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                    }
+                >
                     <Heart size={24} /> Amigos
-                </a>
+                </NavLink>
+
                 <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                     <Bookmark size={24} /> Guardados
                 </a>
