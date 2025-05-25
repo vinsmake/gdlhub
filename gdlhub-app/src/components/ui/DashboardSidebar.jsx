@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
     Eye,
     Heart,
+    Bookmark,
     Home,
     List,
     MapPin,
@@ -36,6 +37,12 @@ export const DashboardSidebar = () => {
                 >
                     <Utensils size={24} /> Restaurantes
                 </Link>
+                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                    <Heart size={24} /> Amigos
+                </a>
+                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                    <Bookmark size={24} /> Guardados
+                </a>
 
                 <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                     <List size={24} /> Categorías
@@ -46,9 +53,7 @@ export const DashboardSidebar = () => {
                 <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                     <MapPin size={24} /> Mapa
                 </a>
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <Heart size={24} /> Favoritos
-                </a>
+
                 <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                     <Eye size={24} /> Visitados
                 </a>
