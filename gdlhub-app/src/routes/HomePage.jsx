@@ -9,28 +9,28 @@ export default function RestaurantsPage() {
         Inicio
       </h1>
 
-<h2 className="text-2xl font-semibold text-white">Usuarios que sigues</h2>
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {users.map((u) => (
-    <Link
-      to={`/users/${u.id}`}
-      key={u.id}
-      className="bg-neutral-700 p-4 rounded-2xl shadow-lg hover:bg-neutral-600 transition-colors"
-    >
-      <div className="flex items-center gap-4">
-        <img
-          src={`http://localhost:3000/img/user/${u.avatar}`}
-          alt={u.name}
-          className="w-16 h-16 rounded-full object-cover"
-        />
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-white">{u.name}</h2>
-          <p className="text-sm text-gray-300">{u.email}</p>
-        </div>
+      <h2 className="text-2xl font-semibold text-white">Usuarios que sigues</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {users.map((u) => (
+          <Link
+            to={`/users/${u.id}`}
+            key={u.id}
+            className="bg-neutral-700 p-4 rounded-2xl shadow-lg hover:bg-neutral-600 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <img
+                src={`http://localhost:3000/img/user/${u.avatar}`}
+                alt={u.name}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-white">{u.name}</h2>
+                <p className="text-sm text-gray-300">{u.email}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
-    </Link>
-  ))}
-</div>
 
 
 
