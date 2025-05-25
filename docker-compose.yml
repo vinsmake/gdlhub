@@ -39,6 +39,7 @@ services:
       - DB_NAME=${DB_NAME}
     volumes:
       - ./gdlhub-api:/app
+      - ./db:/app/db  
       - /app/node_modules
     ports:
       - "${APIPORT}:${APIPORT}"
