@@ -36,7 +36,7 @@ export default function RestaurantPost() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-neutral-800 p-6 rounded-xl text-white space-y-6 shadow-lg mt-10">
+    <div className="max-w-2xl mx-auto bg-neutral-800 p-6 rounded-2xl text-white space-y-6 shadow-lg mt-10">
       <h1 className="text-3xl font-bold mb-4">Registrar nuevo restaurante</h1>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <input
@@ -74,11 +74,11 @@ export default function RestaurantPost() {
           className="w-full p-2 rounded bg-neutral-700 text-white"
         />
 
-        {error && <p className="text-red-400">{error}</p>}
+        {error && <p className="text-red-500">{error}</p>}
 
         <button
           type="submit"
-          className="bg-fuchsia-600 hover:bg-fuchsia-500 px-6 py-2 rounded text-white font-semibold transition"
+          className="bg-red-600 hover:bg-red-500 px-6 py-2 rounded text-white font-semibold transition"
         >
           Registrar
         </button>
