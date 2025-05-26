@@ -10,6 +10,7 @@ import { restaurantsLoader } from "./loaders/restaurantsLoaders";
 import { restaurantDetailLoader } from "./loaders/restaurantDetailLoaders";
 import { homeLoader } from "./loaders/homeLoader";
 import HomePage from "./routes/HomePage";
+import RestaurantPost from "./routes/RestaurantPost";
 
 
 const router = createBrowserRouter([
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "users/:uid", element: <UserDetail />, loader: userDetailLoader },
       { path: "restaurants", element: <RestaurantsPage />, loader: restaurantsLoader },
       { path: "restaurants/:rid", element: <RestaurantDetail />, loader: restaurantDetailLoader },
+      { path: "restaurants/new", element: <RestaurantPost /> },
     ],
   },
 ]);
