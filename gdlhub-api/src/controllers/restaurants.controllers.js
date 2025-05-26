@@ -16,10 +16,10 @@ export const getRestaurantById = async (req, res) => {
 
 export const createRestaurant = async (req, res) => {
   try {
-    const { name, description, address } = req.body;
+    const { name, description, address, maps } = req.body;
     const { rows } = await pool.query(
-      'INSERT INTO restaurants (name, description, address) VALUES ($1, $2, $3) RETURNING *',
-      [name, description, address]
+      'INSERT INTO restaurants (name, description, address, maps) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, description, address, maps]
     );
     res.status(201).json(rows[0]);
   } catch (error) {
