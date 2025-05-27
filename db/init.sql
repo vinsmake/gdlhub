@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
 -- Datos de prueba para usuarios con imagen
 INSERT INTO users (name, email, avatar)
 VALUES 
-  ('Usuario 1', 'user1@example.com', 'pc1.jpg'),
+  ('Enrique Plascencia', 'Enrique@example.com', 'pc1.jpg'),
   ('Usuario 2', 'user2@example.com', 'pc2.jpg'),
   ('Usuario 3', 'user3@example.com', 'pc3.jpg'),
   ('Usuario 4', 'user4@example.com', 'pc4.jpg'),

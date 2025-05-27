@@ -18,16 +18,16 @@ const { Sidebar } = data;
 
 export const DashboardSidebar = () => {
     return (
-        <aside className="sticky top-4 self-start w-1/5 rounded-xl p-4 text-lg text-white">
-
+        <aside className="w-full lg:w-1/5 bg-neutral-900 rounded-xl p-4 text-lg text-white">
             {/* Logo + título */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
                 <img src={Sidebar.logo} alt="Logo GDLHUB" className="w-16 h-16 rounded" />
                 <span className="text-3xl font-semibold tracking-widest">{Sidebar.title}</span>
             </div>
 
+
             {/* Navegación */}
-            <nav className="flex flex-col gap-2">
+            <nav className="flex flex-wrap lg:flex-col gap-2">
                 <NavLink
                     to="/"
                     className={({ isActive }) =>
