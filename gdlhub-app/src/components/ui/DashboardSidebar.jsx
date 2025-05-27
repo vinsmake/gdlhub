@@ -18,11 +18,11 @@ const { Sidebar } = data;
 
 export const DashboardSidebar = () => {
     return (
-        <aside className="w-full lg:w-1/5 bg-neutral-900 rounded-xl p-4 text-lg text-white lg:sticky lg:top-4 self-start">
+        <aside className="w-full lg:w-1/5 bg-neutral-900 rounded-xl p-0 lg:p-4 text-lg text-white lg:sticky lg:top-4 self-start">
             {/* Logo + título */}
-            <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+            <div className="flex items-center justify-center lg:justify-start gap-3 mb-4 pt-[48px] lg:pt-0">
                 <img src={Sidebar.logo} alt="Logo GDLHUB" className="w-16 h-16 rounded" />
-                <span className="text-3xl font-semibold tracking-widest">{Sidebar.title}</span>
+                <span className="text-5xl lg:text-4xl font-semibold tracking-widest">{Sidebar.title}</span>
             </div>
 
             {/* Contenedor sticky SOLO para móvil */}
