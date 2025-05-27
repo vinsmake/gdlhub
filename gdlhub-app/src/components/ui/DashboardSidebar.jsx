@@ -18,64 +18,66 @@ const { Sidebar } = data;
 
 export const DashboardSidebar = () => {
     return (
-        <aside className="w-full lg:w-1/5 bg-neutral-900 rounded-xl p-4 text-lg text-white">
+        <aside className="w-full lg:w-1/5 bg-neutral-900 rounded-xl p-4 text-lg text-white lg:sticky lg:top-4 self-start">
             {/* Logo + título */}
-            <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
+            <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
                 <img src={Sidebar.logo} alt="Logo GDLHUB" className="w-16 h-16 rounded" />
                 <span className="text-3xl font-semibold tracking-widest">{Sidebar.title}</span>
             </div>
 
+            {/* Contenedor sticky SOLO para móvil */}
+            <div className="fixed top-0 left-0 w-full z-10 bg-neutral-900 px-4 py-2 lg:static lg:w-auto">
+                <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible scrollbar-hide">
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
+                        <Home size={24} /> Inicio
+                    </NavLink>
 
-            {/* Navegación */}
-            <nav className="flex flex-wrap lg:flex-col gap-2">
-                <NavLink
-                    to="/"
-                    className={({ isActive }) =>
-                        `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
-                    }
-                >
-                    <Home size={24} /> Inicio
-                </NavLink>
+                    <NavLink
+                        to="/restaurants"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
+                        <Utensils size={24} /> Restaurantes
+                    </NavLink>
 
-                <NavLink
-                    to="/restaurants"
-                    className={({ isActive }) =>
-                        `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
-                    }
-                >
-                    <Utensils size={24} /> Restaurantes
-                </NavLink>
+                    <NavLink
+                        to="/users"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
+                        <Heart size={24} /> Amigos
+                    </NavLink>
 
-                <NavLink
-                    to="/users"
-                    className={({ isActive }) =>
-                        `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
-                    }
-                >
-                    <Heart size={24} /> Amigos
-                </NavLink>
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <Bookmark size={24} /> Guardados
+                    </a>
 
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <Bookmark size={24} /> Guardados
-                </a>
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <List size={24} /> Categorías
+                    </a>
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <Percent size={24} /> Ofertas
+                    </a>
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <MapPin size={24} /> Mapa
+                    </a>
 
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <List size={24} /> Categorías
-                </a>
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <Percent size={24} /> Ofertas
-                </a>
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <MapPin size={24} /> Mapa
-                </a>
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <Eye size={24} /> Visitados
+                    </a>
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <Settings size={24} /> Configuración
+                    </a>
+                </nav>
+            </div>
 
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <Eye size={24} /> Visitados
-                </a>
-                <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                    <Settings size={24} /> Configuración
-                </a>
-            </nav>
         </aside>
     );
 };

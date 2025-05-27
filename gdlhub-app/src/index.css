@@ -24,3 +24,11 @@
     @apply bg-red-800 text-white;
 }
 
+/* tailwind.css o index.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
