@@ -7,12 +7,43 @@ export const getRestaurants = async (req, res) => {
 
 export const getRestaurantById = async (req, res) => {
   const { rid } = req.params;
-  const { rows } = await pool.query('SELECT * FROM restaurants WHERE id = $1', [rid]);
-  if (rows.length === 0) {
-    return res.status(404).json({ message: "Restaurant not found" });
+
+  try {
+    // 1. Restaurante
+    const { rows: restaurantRows } = await pool.query(
+      "SELECT * FROM restaurants WHERE id = $1",
+      [rid]
+    );
+    if (restaurantRows.length === 0) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const restaurant = restaurantRows[0];
+
+    // 2. Especialidades
+    const { rows: specialties } = await pool.query(
+      "SELECT name FROM specialties WHERE restaurant_id = $1",
+      [rid]
+    );
+
+    // 3. Menú
+    const { rows: menu } = await pool.query(
+      "SELECT id, name, description, price, category, image FROM menu_items WHERE restaurant_id = $1 ORDER BY category, name",
+      [rid]
+    );
+
+    // 4. Respuesta combinada
+    res.json({
+      ...restaurant,
+      specialties: specialties.map(s => s.name),
+      menu
+    });
+  } catch (error) {
+    console.error("Error fetching restaurant details:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-  res.json(rows[0]);
 };
+
 
 export const createRestaurant = async (req, res) => {
   try {
