@@ -46,18 +46,57 @@ export const getRestaurantById = async (req, res) => {
 
 
 export const createRestaurant = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const { name, description, address, maps } = req.body;
-    const { rows } = await pool.query(
+    const { name, description, address, maps, specialties = [], menu = [] } = req.body;
+
+    await client.query("BEGIN");
+
+    // 1. Insertar restaurante
+    const { rows } = await client.query(
       'INSERT INTO restaurants (name, description, address, maps) VALUES ($1, $2, $3, $4) RETURNING *',
       [name, description, address, maps]
     );
-    res.status(201).json(rows[0]);
+    const restaurant = rows[0];
+
+    // 2. Insertar especialidades (si hay)
+    for (const spec of specialties) {
+      if (spec.trim()) {
+        await client.query(
+          'INSERT INTO specialties (restaurant_id, name) VALUES ($1, $2)',
+          [restaurant.id, spec.trim()]
+        );
+      }
+    }
+
+    // 3. Insertar elementos del menú (si hay)
+    for (const item of menu) {
+      if (item.name.trim()) {
+        await client.query(
+          `INSERT INTO menu_items (restaurant_id, name, description, price, category)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [
+            restaurant.id,
+            item.name.trim(),
+            item.description || "",
+            item.price ? parseFloat(item.price) : null,
+            item.category || "",
+          ]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+    res.status(201).json(restaurant);
   } catch (error) {
-    console.log(error);
+    await client.query("ROLLBACK");
+    console.error("Error creating restaurant:", error);
     res.status(500).json({ message: "Error creating restaurant" });
+  } finally {
+    client.release();
   }
 };
+
 
 export const deleteRestaurant = async (req, res) => {
   const { rid } = req.params;
