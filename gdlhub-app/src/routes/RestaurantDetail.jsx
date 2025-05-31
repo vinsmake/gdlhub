@@ -2,7 +2,7 @@ import { useLoaderData } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import { toPng } from "html-to-image";
 import { useRef } from "react";
-import {data} from "../data.js";
+import { data } from "../data.js";
 
 export default function RestaurantDetail() {
 
@@ -12,22 +12,24 @@ export default function RestaurantDetail() {
 
   const qrRef = useRef(null);
 
-const handleDownload = async () => {
-  if (!qrRef.current) return;
+  const handleDownload = async () => {
+    if (!qrRef.current) return;
 
-  try {
-    const dataUrl = await toPng(qrRef.current, {
-      cacheBust: true,
-      pixelRatio: 2, // ⬅️ mejora la calidad exportada (doble resolución)
-    });
-    const link = document.createElement("a");
-    link.download = `qr-${restaurant.id}.png`;
-    link.href = dataUrl;
-    link.click();
-  } catch (err) {
-    console.error("Error al generar la imagen:", err);
-  }
-};
+    try {
+      const dataUrl = await toPng(qrRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        skipFonts: true,
+      });
+
+      const link = document.createElement("a");
+      link.download = `qr-${restaurant.id}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Error al generar la imagen:", err);
+    }
+  };
 
 
   return (
@@ -89,33 +91,48 @@ const handleDownload = async () => {
         ))}
       </div>
 
+
+
+
+
+
+
 <div className="mt-10 text-center space-y-4">
   <h3 className="text-lg font-semibold text-gray-300">Escanea el QR para compartir</h3>
 
-  <div
-    ref={qrRef}
-    className="inline-block bg-white rounded-2xl relative"
-    style={{ width: "max-content", padding: 10 }}
-  >
-    <div className="relative w-[300px] h-[300px]">
-      <QRCodeCanvas value={restaurantUrl} size={300} />
-      <img
-        src="/logo_qr.png"
-        alt="Logo"
-        className="w-16 h-16 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-      />
+  {/* Contenedor con borde rojo total */}
+<div
+  ref={qrRef}
+  onClick={handleDownload}
+  className="inline-block cursor-pointer border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
+  style={{ width: "max-content" }}
+>
+
+    {/* Parte blanca con el QR */}
+    <div className="bg-white p-3">
+      <div className="relative w-[300px] h-[300px]">
+        <QRCodeCanvas value={restaurantUrl} size={300} />
+        <img
+          src="/logo_qr.png"
+          alt="Logo"
+          className="w-16 h-16 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        />
+      </div>
+    </div>
+
+    {/* Pie con fondo rojo */}
+    <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
+      <p className="text-base font-semibold">{restaurant.name}</p>
+      <p className="text-sm font-light tracking-wide">GDLHUB</p>
     </div>
   </div>
 
-  <p className="text-sm text-gray-400">Abre este restaurante en GDLHUB</p>
-
-  <button
-    onClick={handleDownload}
-    className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded font-semibold text-white transition"
-  >
-    Descargar QR
-  </button>
+  <p className="text-sm text-gray-400">Mantén pulsado para compartir o toca para descargar</p>
 </div>
+
+
+
+
 
 
 
