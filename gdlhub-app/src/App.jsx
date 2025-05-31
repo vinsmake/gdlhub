@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./routes/RootLayout";
 import UsersPage from "./routes/UsersPage";
 import UserDetail from "./routes/UserDetail";
@@ -11,6 +11,8 @@ import { restaurantDetailLoader } from "./loaders/restaurantDetailLoaders";
 import { homeLoader } from "./loaders/homeLoader";
 import HomePage from "./routes/HomePage";
 import RestaurantPost from "./routes/RestaurantPost";
+import RestaurantEdit from "./routes/RestaurantEdit";
+import { restaurantEditLoader } from "./loaders/restaurantEditLoader";
 
 
 const router = createBrowserRouter([
@@ -24,6 +26,12 @@ const router = createBrowserRouter([
       { path: "restaurants", element: <RestaurantsPage />, loader: restaurantsLoader },
       { path: "restaurants/:rid", element: <RestaurantDetail />, loader: restaurantDetailLoader },
       { path: "restaurants/new", element: <RestaurantPost /> },
+      {
+        path: "/restaurants/:rid/edit",
+        element: <RestaurantEdit />,
+        loader: restaurantEditLoader, 
+      }
+
     ],
   },
 ]);

@@ -109,10 +109,60 @@ export const deleteRestaurant = async (req, res) => {
 
 export const updateRestaurant = async (req, res) => {
   const { rid } = req.params;
-  const { name, description, address } = req.body;
-  await pool.query(
-    'UPDATE restaurants SET name = $1, description = $2, address = $3 WHERE id = $4',
-    [name, description, address, rid]
-  );
-  res.send("Restaurant updated");
+  const { name, description, address, maps, specialties = [], menu = [] } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // 1. Actualizar datos básicos
+    await client.query(
+      `UPDATE restaurants
+       SET name = $1, description = $2, address = $3, maps = $4
+       WHERE id = $5`,
+      [name, description, address, maps, rid]
+    );
+
+    // 2. Reemplazar especialidades
+    await client.query("DELETE FROM specialties WHERE restaurant_id = $1", [rid]);
+
+    for (const spec of specialties) {
+      if (spec.trim()) {
+        await client.query(
+          "INSERT INTO specialties (restaurant_id, name) VALUES ($1, $2)",
+          [rid, spec.trim()]
+        );
+      }
+    }
+
+    // 3. Reemplazar menú
+    await client.query("DELETE FROM menu_items WHERE restaurant_id = $1", [rid]);
+
+    for (const item of menu) {
+      if (item.name.trim()) {
+        await client.query(
+          `INSERT INTO menu_items (restaurant_id, name, description, price, category, image)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            rid,
+            item.name.trim(),
+            item.description || "",
+            item.price ? parseFloat(item.price) : null,
+            item.category || "",
+            item.image || null,
+          ]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+    res.json({ message: "Restaurante actualizado correctamente" });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error actualizando restaurante:", err);
+    res.status(500).json({ message: "Error actualizando restaurante" });
+  } finally {
+    client.release();
+  }
 };
+
