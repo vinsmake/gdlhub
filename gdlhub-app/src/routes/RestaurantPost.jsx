@@ -1,6 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Categorías y etiquetas predefinidas
+const CATEGORIES = [
+  { id: 1, name: "Desayuno" },
+  { id: 2, name: "Comida" },
+  { id: 3, name: "Cena" },
+  { id: 4, name: "Repostería" },
+  { id: 5, name: "Bebida" },
+  { id: 6, name: "Bebida con alcohol" },
+  { id: 7, name: "Entrada" },
+  { id: 8, name: "Temporada" },
+];
+
+const TAGS = [
+  { id: 1, name: "Opción vegana" },
+  { id: 2, name: "Opción vegetariana" },
+  { id: 3, name: "Opción sin gluten" },
+  { id: 4, name: "Opción diabética" },
+];
+
 export default function RestaurantPost() {
   const [form, setForm] = useState({
     name: "",
@@ -10,7 +29,9 @@ export default function RestaurantPost() {
   });
 
   const [specialties, setSpecialties] = useState([""]);
-  const [menuItems, setMenuItems] = useState([{ name: "", price: "", category: "", description: "" }]);
+  const [menuItems, setMenuItems] = useState([
+    { name: "", price: "", description: "", image: "", category_ids: [], tag_ids: [] },
+  ]);
 
   const navigate = useNavigate();
   const [error, setError] = useState(null);
@@ -99,17 +120,6 @@ export default function RestaurantPost() {
                 }}
                 className="w-full p-2 rounded"
               />
-              <input
-                type="text"
-                placeholder="Categoría (ej. Bebida, Desayuno)"
-                value={item.category}
-                onChange={(e) => {
-                  const copy = [...menuItems];
-                  copy[index].category = e.target.value;
-                  setMenuItems(copy);
-                }}
-                className="w-full p-2 rounded"
-              />
               <textarea
                 placeholder="Descripción"
                 value={item.description}
@@ -120,10 +130,67 @@ export default function RestaurantPost() {
                 }}
                 className="w-full p-2 rounded"
               />
+
+              {/* Categorías */}
+              <div>
+                <label className="text-sm font-semibold block text-white">Categorías:</label>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map((cat) => (
+                    <label key={cat.id} className="flex items-center gap-1 text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={item.category_ids.includes(cat.id)}
+                        onChange={(e) => {
+                          const copy = [...menuItems];
+                          const ids = copy[index].category_ids;
+                          copy[index].category_ids = e.target.checked
+                            ? [...ids, cat.id]
+                            : ids.filter((id) => id !== cat.id);
+                          setMenuItems(copy);
+                        }}
+                      />
+                      {cat.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Etiquetas */}
+              <div>
+                <label className="text-sm font-semibold block text-white mt-2">Etiquetas:</label>
+                <div className="flex flex-wrap gap-2">
+                  {TAGS.map((tag) => (
+                    <label key={tag.id} className="flex items-center gap-1 text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={item.tag_ids.includes(tag.id)}
+                        onChange={(e) => {
+                          const copy = [...menuItems];
+                          const ids = copy[index].tag_ids;
+                          copy[index].tag_ids = e.target.checked
+                            ? [...ids, tag.id]
+                            : ids.filter((id) => id !== tag.id);
+                          setMenuItems(copy);
+                        }}
+                      />
+                      {tag.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           ))}
           {menuItems.length < 10 && (
-            <button type="button" onClick={() => setMenuItems([...menuItems, { name: "", price: "", category: "", description: "" }])} className="text-sm text-blue-400 mt-1">+ Agregar platillo</button>
+            <button
+              type="button"
+              onClick={() => setMenuItems([
+                ...menuItems,
+                { name: "", price: "", description: "", image: "", category_ids: [], tag_ids: [] },
+              ])}
+              className="text-sm text-blue-400 mt-1"
+            >
+              + Agregar platillo
+            </button>
           )}
         </div>
 

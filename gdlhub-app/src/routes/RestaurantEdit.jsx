@@ -1,6 +1,24 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+const CATEGORIES = [
+  { id: 1, name: "Desayuno" },
+  { id: 2, name: "Comida" },
+  { id: 3, name: "Cena" },
+  { id: 4, name: "Repostería" },
+  { id: 5, name: "Bebida" },
+  { id: 6, name: "Bebida con alcohol" },
+  { id: 7, name: "Entrada" },
+  { id: 8, name: "Temporada" },
+];
+
+const TAGS = [
+  { id: 1, name: "Opción vegana" },
+  { id: 2, name: "Opción vegetariana" },
+  { id: 3, name: "Opción sin gluten" },
+  { id: 4, name: "Opción diabética" },
+];
+
 export default function RestaurantEdit() {
   const data = useLoaderData();
   const navigate = useNavigate();
@@ -13,7 +31,15 @@ export default function RestaurantEdit() {
   });
 
   const [specialties, setSpecialties] = useState(data.specialties || [""]);
-  const [menuItems, setMenuItems] = useState(data.menu || []);
+
+  const [menuItems, setMenuItems] = useState(
+    data.menu.map((item) => ({
+      ...item,
+      price: item.price || "",
+      category_ids: item.category_ids || [],
+      tag_ids: item.tag_ids || [],
+    }))
+  );
 
   const [error, setError] = useState(null);
 
@@ -48,37 +74,10 @@ export default function RestaurantEdit() {
     <div className="max-w-2xl mx-auto bg-neutral-800 p-6 rounded-2xl text-white space-y-6 shadow-lg mt-10">
       <h1 className="text-3xl font-bold mb-4">Editar restaurante</h1>
       <form className="space-y-6" onSubmit={handleSubmit}>
-        <input
-          name="name"
-          placeholder="Nombre"
-          value={form.name}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-neutral-700"
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Descripción"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-neutral-700"
-          required
-        />
-        <input
-          name="address"
-          placeholder="Dirección"
-          value={form.address}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-neutral-700"
-          required
-        />
-        <input
-          name="maps"
-          placeholder="Embed URL de Google Maps"
-          value={form.maps}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-neutral-700"
-        />
+        <input name="name" placeholder="Nombre" value={form.name} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" required />
+        <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" required />
+        <input name="address" placeholder="Dirección" value={form.address} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" required />
+        <input name="maps" placeholder="Embed URL de Google Maps" value={form.maps} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" />
 
         {/* Especialidades */}
         <div>
@@ -98,9 +97,7 @@ export default function RestaurantEdit() {
             />
           ))}
           {specialties.length < 5 && (
-            <button type="button" onClick={() => setSpecialties([...specialties, ""])} className="text-sm text-blue-400">
-              + Agregar especialidad
-            </button>
+            <button type="button" onClick={() => setSpecialties([...specialties, ""])} className="text-sm text-blue-400">+ Agregar especialidad</button>
           )}
         </div>
 
@@ -132,17 +129,6 @@ export default function RestaurantEdit() {
                 }}
                 className="w-full p-2 rounded"
               />
-              <input
-                type="text"
-                placeholder="Categoría"
-                value={item.category}
-                onChange={(e) => {
-                  const copy = [...menuItems];
-                  copy[index].category = e.target.value;
-                  setMenuItems(copy);
-                }}
-                className="w-full p-2 rounded"
-              />
               <textarea
                 placeholder="Descripción"
                 value={item.description}
@@ -153,10 +139,63 @@ export default function RestaurantEdit() {
                 }}
                 className="w-full p-2 rounded"
               />
+
+              {/* Categorías */}
+              <label className="text-sm font-semibold block text-white">Categorías:</label>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map((cat) => (
+                  <label key={cat.id} className="flex items-center gap-1 text-sm text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={menuItems[index].category_ids?.includes(cat.id)}
+                      onChange={(e) => {
+                        const copy = [...menuItems];
+                        const selected = copy[index].category_ids || [];
+                        copy[index].category_ids = e.target.checked
+                          ? [...selected, cat.id]
+                          : selected.filter((id) => id !== cat.id);
+                        setMenuItems(copy);
+                      }}
+                    />
+                    {cat.name}
+                  </label>
+                ))}
+              </div>
+
+              {/* Etiquetas */}
+              <label className="text-sm font-semibold block text-white mt-2">Etiquetas:</label>
+              <div className="flex flex-wrap gap-2">
+                {TAGS.map((tag) => (
+                  <label key={tag.id} className="flex items-center gap-1 text-sm text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={menuItems[index].tag_ids?.includes(tag.id)}
+                      onChange={(e) => {
+                        const copy = [...menuItems];
+                        const selected = copy[index].tag_ids || [];
+                        copy[index].tag_ids = e.target.checked
+                          ? [...selected, tag.id]
+                          : selected.filter((id) => id !== tag.id);
+                        setMenuItems(copy);
+                      }}
+                    />
+                    {tag.name}
+                  </label>
+                ))}
+              </div>
             </div>
           ))}
           {menuItems.length < 10 && (
-            <button type="button" onClick={() => setMenuItems([...menuItems, { name: "", price: "", category: "", description: "" }])} className="text-sm text-blue-400">
+            <button
+              type="button"
+              onClick={() =>
+                setMenuItems([
+                  ...menuItems,
+                  { name: "", price: "", description: "", image: "", category_ids: [], tag_ids: [] },
+                ])
+              }
+              className="text-sm text-blue-400"
+            >
               + Agregar platillo
             </button>
           )}

@@ -290,3 +290,132 @@ VALUES
   (9, 'Chocolate caliente', 'Chocolate espeso estilo tradicional', 48.00, 'Bebida'),
   (9, 'Panque de Nuez', 'Rebanada de panque casero con nuez', 34.00, 'Postre'),
   (9, 'Café con leche', 'Café con leche vaporizada', 36.00, 'Bebida');
+
+-- Categorías de menú
+CREATE TABLE IF NOT EXISTS menu_categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Etiquetas de tipo dietético / extra
+CREATE TABLE IF NOT EXISTS menu_tags (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Relación muchos-a-muchos: menu_items x categories
+CREATE TABLE IF NOT EXISTS menu_item_categories (
+  menu_item_id INTEGER REFERENCES menu_items(id) ON DELETE CASCADE,
+  category_id INTEGER REFERENCES menu_categories(id) ON DELETE CASCADE,
+  PRIMARY KEY (menu_item_id, category_id)
+);
+
+-- Relación muchos-a-muchos: menu_items x tags
+CREATE TABLE IF NOT EXISTS menu_item_tags (
+  menu_item_id INTEGER REFERENCES menu_items(id) ON DELETE CASCADE,
+  tag_id INTEGER REFERENCES menu_tags(id) ON DELETE CASCADE,
+  PRIMARY KEY (menu_item_id, tag_id)
+);
+
+-- Categorías
+INSERT INTO menu_categories (name)
+VALUES 
+  ('Desayuno'),
+  ('Comida'),
+  ('Cena'),
+  ('Repostería'),
+  ('Bebida'),
+  ('Bebida con alcohol'),
+  ('Snack'),
+  ('Entrada'),
+  ('Temporada'),
+  ('Acompañamiento');
+
+-- Etiquetas
+INSERT INTO menu_tags (name)
+VALUES 
+  ('Opción vegetariana'),
+  ('Opción vegana'),
+  ('Opción diabética'),
+  ('Sin gluten'),
+  ('Sin lactosa'),
+  ('Bajo en calorías'),
+  ('Alto en proteína');
+
+-- Menú extenso para "La Antigua Waffles"
+INSERT INTO menu_items (restaurant_id, name, description, price, category, image) VALUES
+-- Desayunos
+(1, 'Waffle Clásico', 'Waffle belga con miel de maple y mantequilla', 89.00, 'Desayuno', null),
+(1, 'Waffle de Nutella', 'Waffle con Nutella, fresas y plátano', 99.00, 'Desayuno', null),
+(1, 'Hotcakes', '3 hotcakes con mantequilla y miel', 85.00, 'Desayuno', null),
+(1, 'Molletes', 'Pan con frijoles refritos, queso gratinado y pico de gallo', 79.00, 'Desayuno', null),
+(1, 'Omelette Vegetariano', 'Huevos, champiñones, espinaca y queso panela', 90.00, 'Desayuno', null),
+(1, 'Tostadas Francesas', 'Rebanadas de pan empapadas en huevo y canela, con miel', 95.00, 'Desayuno', null),
+(1, 'Chilaquiles Verdes', 'Tortilla frita en salsa verde, crema, queso fresco y cebolla', 95.00, 'Desayuno', null),
+(1, 'Chilaquiles Rojos', 'Con salsa roja, crema, queso y cebolla', 95.00, 'Desayuno', null),
+(1, 'Huevos al gusto', 'Dos huevos al gusto con frijoles refritos y pan', 75.00, 'Desayuno', null),
+(1, 'Enmoladas', '3 tortillas rellenas bañadas en mole casero', 99.00, 'Desayuno', null),
+(1, 'Enfrijoladas', 'Rellenas de queso y bañadas en frijol con crema y cebolla', 89.00, 'Desayuno', null),
+
+-- Comidas
+(1, 'Hamburguesa de Res', 'Pan artesanal con carne de res, lechuga, jitomate y papas', 130.00, 'Comida', null),
+(1, 'Hamburguesa Vegetariana', 'Con portobello asado, espinaca y aderezo chipotle', 125.00, 'Comida', null),
+(1, 'Ensalada César', 'Lechuga romana, aderezo césar, crotones y parmesano', 99.00, 'Comida', null),
+(1, 'Club Sándwich', 'Pollo, jamón, queso, lechuga y tomate en pan integral', 110.00, 'Comida', null),
+(1, 'Wrap de Pollo', 'Pollo a la parrilla, lechuga, jitomate y aderezo en tortilla', 105.00, 'Comida', null),
+
+-- Repostería
+(1, 'Cheesecake de Zarzamora', 'Rebanada de cheesecake artesanal con coulis de zarzamora', 65.00, 'Repostería', null),
+(1, 'Brownie con Nuez', 'Brownie tibio con nuez y bola de helado', 70.00, 'Repostería', null),
+(1, 'Panqué de Plátano', 'Con nuez y chispas de chocolate', 60.00, 'Repostería', null),
+
+-- Bebidas sin alcohol
+(1, 'Café Americano Helado', 'Taza de café de grano recién molido', 35.00, 'Bebida', null),
+(1, 'Café Latte', 'Espresso con leche vaporizada', 45.00, 'Bebida', null),
+(1, 'Jugo de Naranja', 'Natural, exprimido al momento', 42.00, 'Bebida', null),
+(1, 'Té Verde', 'Infusión caliente con miel', 30.00, 'Bebida', null),
+(1, 'Smoothie de Mango', 'Bebida fría de mango con yogurt natural', 50.00, 'Bebida', null),
+
+-- Bebidas con alcohol
+(1, 'Carajillo', 'Licor 43 con espresso', 70.00, 'Bebida con alcohol', null),
+(1, 'Mimosa', 'Jugo de naranja con vino espumoso', 75.00, 'Bebida con alcohol', null);
+
+-- Categorías
+INSERT INTO menu_item_categories (menu_item_id, category_id) SELECT id, 1 FROM menu_items WHERE name IN (
+  'Waffle Clásico', 'Waffle de Nutella', 'Hotcakes', 'Molletes', 'Omelette Vegetariano',
+  'Tostadas Francesas', 'Chilaquiles Verdes', 'Chilaquiles Rojos', 'Huevos al gusto',
+  'Enmoladas', 'Enfrijoladas'
+) AND restaurant_id = 1;
+
+INSERT INTO menu_item_categories (menu_item_id, category_id) SELECT id, 2 FROM menu_items WHERE name IN (
+  'Hamburguesa de Res', 'Hamburguesa Vegetariana', 'Ensalada César', 'Club Sándwich', 'Wrap de Pollo'
+) AND restaurant_id = 1;
+
+INSERT INTO menu_item_categories (menu_item_id, category_id) SELECT id, 4 FROM menu_items WHERE name IN (
+  'Cheesecake de Zarzamora', 'Brownie con Nuez', 'Panqué de Plátano'
+) AND restaurant_id = 1;
+
+INSERT INTO menu_item_categories (menu_item_id, category_id) SELECT id, 5 FROM menu_items WHERE name IN (
+  'Café Americano', 'Café Latte', 'Jugo de Naranja', 'Té Verde', 'Smoothie de Mango'
+) AND restaurant_id = 1;
+
+INSERT INTO menu_item_categories (menu_item_id, category_id) SELECT id, 6 FROM menu_items WHERE name IN (
+  'Carajillo', 'Mimosa'
+) AND restaurant_id = 1;
+
+-- Etiquetas
+-- Vegetariano (2)
+INSERT INTO menu_item_tags (menu_item_id, tag_id) SELECT id, 2 FROM menu_items WHERE name IN (
+  'Omelette Vegetariano', 'Hamburguesa Vegetariana', 'Ensalada César', 'Panqué de Plátano'
+) AND restaurant_id = 1;
+
+-- Vegano (3)
+INSERT INTO menu_item_tags (menu_item_id, tag_id) SELECT id, 3 FROM menu_items WHERE name IN (
+  'Jugo de Naranja', 'Té Verde', 'Smoothie de Mango'
+) AND restaurant_id = 1;
+
+-- Diabética (4)
+INSERT INTO menu_item_tags (menu_item_id, tag_id) SELECT id, 4 FROM menu_items WHERE name IN (
+  'Molletes', 'Enfrijoladas'
+) AND restaurant_id = 1;
+
