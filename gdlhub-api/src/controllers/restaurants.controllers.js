@@ -28,24 +28,36 @@ export const getRestaurantById = async (req, res) => {
     // 3. Menú con categorías y etiquetas
     const { rows: menuItems } = await pool.query(
       `
-      SELECT 
-        mi.id,
-        mi.name,
-        mi.description,
-        mi.price,
-        COALESCE(mc.name, 'Otros') AS category,
-        COALESCE(json_agg(DISTINCT mt.name) FILTER (WHERE mt.name IS NOT NULL), '[]') AS tags
-      FROM menu_items mi
-      LEFT JOIN menu_item_categories mic ON mic.menu_item_id = mi.id
-      LEFT JOIN menu_categories mc ON mc.id = mic.category_id
-      LEFT JOIN menu_item_tags mit ON mit.menu_item_id = mi.id
-      LEFT JOIN menu_tags mt ON mt.id = mit.tag_id
-      WHERE mi.restaurant_id = $1
-      GROUP BY mi.id, mc.name
-      ORDER BY mc.name, mi.name
-      `,
+  SELECT 
+    mi.id,
+    mi.name,
+    mi.description,
+    mi.price,
+    COALESCE(mc.name, 'Otros') AS category,
+    COALESCE(
+      json_agg(DISTINCT mt.name) FILTER (WHERE mt.name IS NOT NULL),
+      '[]'
+    ) AS tags,
+    COALESCE(
+      json_agg(DISTINCT mic.category_id) FILTER (WHERE mic.category_id IS NOT NULL),
+      '[]'
+    ) AS category_ids,
+    COALESCE(
+      json_agg(DISTINCT mit.tag_id) FILTER (WHERE mit.tag_id IS NOT NULL),
+      '[]'
+    ) AS tag_ids
+  FROM menu_items mi
+  LEFT JOIN menu_item_categories mic ON mic.menu_item_id = mi.id
+  LEFT JOIN menu_categories mc ON mc.id = mic.category_id
+  LEFT JOIN menu_item_tags mit ON mit.menu_item_id = mi.id
+  LEFT JOIN menu_tags mt ON mt.id = mit.tag_id
+  WHERE mi.restaurant_id = $1
+  GROUP BY mi.id, mc.name
+  ORDER BY mc.name, mi.name
+  `,
       [rid]
     );
+
 
     // 4. Respuesta combinada
     res.json({
