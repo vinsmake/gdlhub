@@ -28,48 +28,62 @@ export const getRestaurantById = async (req, res) => {
     // 3. Menú con categorías y etiquetas
     const { rows: menuItems } = await pool.query(
       `
-  SELECT 
-    mi.id,
-    mi.name,
-    mi.description,
-    mi.price,
-    COALESCE(mc.name, 'Otros') AS category,
-    COALESCE(
-      json_agg(DISTINCT mt.name) FILTER (WHERE mt.name IS NOT NULL),
-      '[]'
-    ) AS tags,
-    COALESCE(
-      json_agg(DISTINCT mic.category_id) FILTER (WHERE mic.category_id IS NOT NULL),
-      '[]'
-    ) AS category_ids,
-    COALESCE(
-      json_agg(DISTINCT mit.tag_id) FILTER (WHERE mit.tag_id IS NOT NULL),
-      '[]'
-    ) AS tag_ids
-  FROM menu_items mi
-  LEFT JOIN menu_item_categories mic ON mic.menu_item_id = mi.id
-  LEFT JOIN menu_categories mc ON mc.id = mic.category_id
-  LEFT JOIN menu_item_tags mit ON mit.menu_item_id = mi.id
-  LEFT JOIN menu_tags mt ON mt.id = mit.tag_id
-  WHERE mi.restaurant_id = $1
-  GROUP BY mi.id, mc.name
-  ORDER BY mc.name, mi.name
-  `,
+SELECT 
+  mi.id,
+  mi.name,
+  mi.description,
+  mi.price,
+  COALESCE(
+    json_agg(DISTINCT mc.name) FILTER (WHERE mc.name IS NOT NULL),
+    '[]'
+  ) AS categories,
+  COALESCE(
+    json_agg(DISTINCT mic.category_id) FILTER (WHERE mic.category_id IS NOT NULL),
+    '[]'
+  ) AS category_ids,
+  COALESCE(
+    json_agg(DISTINCT mt.name) FILTER (WHERE mt.name IS NOT NULL),
+    '[]'
+  ) AS tags,
+  COALESCE(
+    json_agg(DISTINCT mit.tag_id) FILTER (WHERE mit.tag_id IS NOT NULL),
+    '[]'
+  ) AS tag_ids
+FROM menu_items mi
+LEFT JOIN menu_item_categories mic ON mic.menu_item_id = mi.id
+LEFT JOIN menu_categories mc ON mc.id = mic.category_id
+LEFT JOIN menu_item_tags mit ON mit.menu_item_id = mi.id
+LEFT JOIN menu_tags mt ON mt.id = mit.tag_id
+WHERE mi.restaurant_id = $1
+GROUP BY mi.id
+ORDER BY mi.name
+
+      `,
       [rid]
     );
 
+    // 4. Listado completo de categorías y etiquetas
+    const { rows: allCategories } = await pool.query(
+      "SELECT id, name FROM menu_categories ORDER BY name"
+    );
+    const { rows: allTags } = await pool.query(
+      "SELECT id, name FROM menu_tags ORDER BY name"
+    );
 
-    // 4. Respuesta combinada
+    // 5. Respuesta combinada
     res.json({
       ...restaurant,
       specialties: specialties.map((s) => s.name),
-      menu: menuItems
+      menu: menuItems,
+      categories: allCategories,
+      tags: allTags
     });
   } catch (error) {
     console.error("Error fetching restaurant details:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 
 
@@ -168,7 +182,7 @@ export const updateRestaurant = async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // 1. Actualizar datos básicos
+    // 1. Actualizar datos básicos del restaurante
     await client.query(
       `UPDATE restaurants
        SET name = $1, description = $2, address = $3, maps = $4
@@ -178,7 +192,6 @@ export const updateRestaurant = async (req, res) => {
 
     // 2. Reemplazar especialidades
     await client.query("DELETE FROM specialties WHERE restaurant_id = $1", [rid]);
-
     for (const spec of specialties) {
       if (spec.trim()) {
         await client.query(
@@ -188,14 +201,27 @@ export const updateRestaurant = async (req, res) => {
       }
     }
 
-    // 3. Reemplazar menú
+    // 3. Reemplazar relaciones y menú
+    const { rows: existingItems } = await client.query(
+      "SELECT id FROM menu_items WHERE restaurant_id = $1",
+      [rid]
+    );
+    const itemIds = existingItems.map((item) => item.id);
+
+    if (itemIds.length > 0) {
+      await client.query("DELETE FROM menu_item_categories WHERE menu_item_id = ANY($1)", [itemIds]);
+      await client.query("DELETE FROM menu_item_tags WHERE menu_item_id = ANY($1)", [itemIds]);
+    }
+
+    // Eliminar los platillos (después de eliminar sus relaciones)
     await client.query("DELETE FROM menu_items WHERE restaurant_id = $1", [rid]);
 
+    // 4. Insertar nuevos platillos y sus relaciones
     for (const item of menu) {
       if (item.name.trim()) {
         const { rows: itemRows } = await client.query(
           `INSERT INTO menu_items (restaurant_id, name, description, price, image)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
           [
             rid,
             item.name.trim(),
@@ -206,23 +232,21 @@ export const updateRestaurant = async (req, res) => {
         );
         const menuItemId = itemRows[0].id;
 
-        // Insertar categorías
         if (Array.isArray(item.category_ids)) {
           for (const categoryId of item.category_ids) {
             await client.query(
               `INSERT INTO menu_item_categories (menu_item_id, category_id)
-           VALUES ($1, $2)`,
+               VALUES ($1, $2)`,
               [menuItemId, categoryId]
             );
           }
         }
 
-        // Insertar etiquetas
         if (Array.isArray(item.tag_ids)) {
           for (const tagId of item.tag_ids) {
             await client.query(
               `INSERT INTO menu_item_tags (menu_item_id, tag_id)
-           VALUES ($1, $2)`,
+               VALUES ($1, $2)`,
               [menuItemId, tagId]
             );
           }

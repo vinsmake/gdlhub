@@ -1,27 +1,12 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { useState } from "react";
-
-const CATEGORIES = [
-  { id: 1, name: "Desayuno" },
-  { id: 2, name: "Comida" },
-  { id: 3, name: "Cena" },
-  { id: 4, name: "Repostería" },
-  { id: 5, name: "Bebida" },
-  { id: 6, name: "Bebida con alcohol" },
-  { id: 7, name: "Entrada" },
-  { id: 8, name: "Temporada" },
-];
-
-const TAGS = [
-  { id: 1, name: "Opción vegana" },
-  { id: 2, name: "Opción vegetariana" },
-  { id: 3, name: "Opción sin gluten" },
-  { id: 4, name: "Opción diabética" },
-];
+import { useEffect, useState } from "react";
 
 export default function RestaurantEdit() {
   const data = useLoaderData();
   const navigate = useNavigate();
+
+const [categories] = useState(data.categories || []);
+const [tags] = useState(data.tags || []);
 
   const [form, setForm] = useState({
     name: data.name,
@@ -143,7 +128,7 @@ export default function RestaurantEdit() {
               {/* Categorías */}
               <label className="text-sm font-semibold block text-white">Categorías:</label>
               <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                   <label key={cat.id} className="flex items-center gap-1 text-sm text-gray-300">
                     <input
                       type="checkbox"
@@ -165,7 +150,7 @@ export default function RestaurantEdit() {
               {/* Etiquetas */}
               <label className="text-sm font-semibold block text-white mt-2">Etiquetas:</label>
               <div className="flex flex-wrap gap-2">
-                {TAGS.map((tag) => (
+                {tags.map((tag) => (
                   <label key={tag.id} className="flex items-center gap-1 text-sm text-gray-300">
                     <input
                       type="checkbox"
