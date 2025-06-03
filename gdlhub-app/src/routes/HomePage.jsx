@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 
 export default function RestaurantsPage() {
-const { restaurants, users } = useLoaderData();
+  const { restaurants, users } = useLoaderData();
 
 
   const [feed, setFeed] = useState([]);
@@ -119,9 +119,23 @@ const { restaurants, users } = useLoaderData();
             key={r.id}
             className="bg-neutral-700 p-4 rounded-2xl shadow-lg space-y-3 hover:bg-neutral-600 transition-colors"
           >
-            <h2 className="text-2xl font-semibold text-white">{r.name}</h2>
-            <p className="text-sm text-gray-300">{r.description}</p>
-            <p className="text-sm text-gray-400">{r.address}</p>
+            <div className="flex items-center gap-4">
+              {r.image && (
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
+                  <img
+                    src={`http://localhost:3000/img/restaurant/${r.image}`}
+                    alt={r.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div>
+                <h2 className="text-2xl font-semibold text-white">{r.name}</h2>
+                <p className="text-sm text-gray-300">{r.description}</p>
+                <p className="text-sm text-gray-400">{r.address}</p>
+              </div>
+            </div>
+
             <div className="mt-2">
               <iframe
                 src={r.maps}
@@ -137,6 +151,7 @@ const { restaurants, users } = useLoaderData();
           </Link>
         ))}
       </div>
+
     </div>
   );
 }
