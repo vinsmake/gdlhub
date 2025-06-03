@@ -108,3 +108,33 @@ export const getUserFeed = async (req, res) => {
     res.status(500).json({ message: "Error retrieving feed" });
   }
 };
+
+export const getFollowingUsers = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query(`
+      SELECT u.id, u.name, u.email, u.avatar
+      FROM user_follows uf
+      JOIN users u ON u.id = uf.followed_id
+      WHERE uf.follower_id = $1
+    `, [id]);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching followed users" });
+  }
+};
+
+export const getFavoriteRestaurants = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query(`
+      SELECT r.*
+      FROM favorite_restaurants fr
+      JOIN restaurants r ON r.id = fr.restaurant_id
+      WHERE fr.user_id = $1
+    `, [id]);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching favorite restaurants" });
+  }
+};

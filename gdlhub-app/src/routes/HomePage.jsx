@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 
 export default function RestaurantsPage() {
-  const { restaurants, users } = useLoaderData();
+const { restaurants, users } = useLoaderData();
 
 
   const [feed, setFeed] = useState([]);

@@ -1,13 +1,11 @@
 export async function homeLoader() {
-  const [resRestaurants, resUsers] = await Promise.all([
-    fetch("http://localhost:3000/restaurants"),
-    fetch("http://localhost:3000/users"),
+  const [usersRes, restaurantsRes] = await Promise.all([
+    fetch("http://localhost:3000/users/1/following"),
+    fetch("http://localhost:3000/users/1/favorite-restaurants")
   ]);
 
-  const [restaurants, users] = await Promise.all([
-    resRestaurants.json(),
-    resUsers.json(),
-  ]);
-
-  return { restaurants, users };
+  return {
+    users: await usersRes.json(),
+    restaurants: await restaurantsRes.json()
+  };
 }
