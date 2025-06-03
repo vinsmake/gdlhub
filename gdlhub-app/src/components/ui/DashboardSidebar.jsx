@@ -11,6 +11,7 @@ import {
     Percent,
     Settings,
     Utensils,
+    Earth
 } from "lucide-react";
 
 import { data } from "../../data";
@@ -46,15 +47,19 @@ export const DashboardSidebar = () => {
                         <Utensils size={24} /> Restaurantes
                     </NavLink>
 
+
                     <NavLink
                         to="/users"
                         className={({ isActive }) =>
                             `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
                         }
                     >
-                        <Heart size={24} /> Amigos
+                        <Earth size={24} /> Comunidad
                     </NavLink>
 
+                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                        <Heart size={24} /> Seguidos
+                    </a>
                     <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                         <Bookmark size={24} /> Guardados
                     </a>
