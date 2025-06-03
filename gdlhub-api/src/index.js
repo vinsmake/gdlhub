@@ -21,6 +21,8 @@ app.use(restaurantRoutes);
 app.use(userRoutes);
 app.use(socialRoutes);
 app.use("/img/user", express.static(path.resolve(process.cwd(), "db/img/user")));
+app.use("/img/restaurant", express.static(path.resolve(process.cwd(), "db/img/restaurants/profile")));
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);

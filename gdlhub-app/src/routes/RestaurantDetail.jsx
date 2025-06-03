@@ -78,6 +78,18 @@ export default function RestaurantDetail() {
   return (
     <div className="bg-neutral-800 p-8 rounded-2xl shadow-xl text-white space-y-6 w-full max-w-7xl mx-auto px-4">
       <h2 className="text-4xl font-bold">{restaurant.name}</h2>
+      {restaurant.image && (
+<div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
+  <img
+    src={`http://localhost:3000/img/restaurant/${restaurant.image}`}
+    alt={restaurant.name}
+    className="w-full h-full object-cover"
+  />
+</div>
+
+
+      )}
+
 
       <p className="text-lg text-gray-300">
         <span className="font-semibold text-gray-200">Ubicación:</span>{" "}
