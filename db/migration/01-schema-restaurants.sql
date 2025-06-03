@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
   description TEXT,
   address TEXT,
   maps TEXT,
+  image VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -11,7 +12,8 @@ CREATE TABLE IF NOT EXISTS restaurants (
 CREATE TABLE IF NOT EXISTS specialties (
   id SERIAL PRIMARY KEY,
   restaurant_id INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-  name VARCHAR(100) NOT NULL
+  name VARCHAR(100) NOT NULL,
+  image VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS menu_items (
@@ -20,8 +22,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
   name VARCHAR(255) NOT NULL,
   description TEXT,
   price NUMERIC(6,2),
-  category VARCHAR(50),
-  image VARCHAR(255)   
+  category VARCHAR(50)
 );
 
 

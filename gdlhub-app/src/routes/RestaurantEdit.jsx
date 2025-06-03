@@ -176,7 +176,7 @@ const [tags] = useState(data.tags || []);
               onClick={() =>
                 setMenuItems([
                   ...menuItems,
-                  { name: "", price: "", description: "", image: "", category_ids: [], tag_ids: [] },
+                  { name: "", price: "", description: "", category_ids: [], tag_ids: [] },
                 ])
               }
               className="text-sm text-blue-400"

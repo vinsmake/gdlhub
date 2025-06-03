@@ -30,7 +30,7 @@ export default function RestaurantPost() {
 
   const [specialties, setSpecialties] = useState([""]);
   const [menuItems, setMenuItems] = useState([
-    { name: "", price: "", description: "", image: "", category_ids: [], tag_ids: [] },
+    { name: "", price: "", description: "", category_ids: [], tag_ids: [] },
   ]);
 
   const navigate = useNavigate();
@@ -185,7 +185,7 @@ export default function RestaurantPost() {
               type="button"
               onClick={() => setMenuItems([
                 ...menuItems,
-                { name: "", price: "", description: "", image: "", category_ids: [], tag_ids: [] },
+                { name: "", price: "", description: "", category_ids: [], tag_ids: [] },
               ])}
               className="text-sm text-blue-400 mt-1"
             >

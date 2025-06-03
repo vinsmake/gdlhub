@@ -116,14 +116,13 @@ export const createRestaurant = async (req, res) => {
     for (const item of menu) {
       if (item.name.trim()) {
         const { rows: itemRows } = await client.query(
-          `INSERT INTO menu_items (restaurant_id, name, description, price, image)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          `INSERT INTO menu_items (restaurant_id, name, description, price)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
           [
             restaurant.id,
             item.name.trim(),
             item.description || "",
             item.price ? parseFloat(item.price) : null,
-            item.image || null
           ]
         );
         const menuItemId = itemRows[0].id;
@@ -220,14 +219,13 @@ export const updateRestaurant = async (req, res) => {
     for (const item of menu) {
       if (item.name.trim()) {
         const { rows: itemRows } = await client.query(
-          `INSERT INTO menu_items (restaurant_id, name, description, price, image)
-           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          `INSERT INTO menu_items (restaurant_id, name, description, price)
+           VALUES ($1, $2, $3, $4) RETURNING id`,
           [
             rid,
             item.name.trim(),
             item.description || "",
             item.price ? parseFloat(item.price) : null,
-            item.image || null,
           ]
         );
         const menuItemId = itemRows[0].id;
