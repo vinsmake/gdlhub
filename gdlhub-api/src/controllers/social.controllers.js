@@ -40,3 +40,33 @@ export const addRestaurantComment = async (req, res) => {
     res.status(500).json({ message: "Error al agregar comentario" });
   }
 };
+
+export const getUserFeed = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        c.id AS comment_id,
+        c.content,
+        c.created_at,
+        u.id AS user_id,
+        u.name AS user_name,
+        u.avatar,
+        r.id AS restaurant_id,
+        r.name AS restaurant_name
+      FROM user_follows uf
+      JOIN users u ON u.id = uf.followed_id
+      JOIN comments c ON c.user_id = u.id
+      JOIN restaurants r ON r.id = c.restaurant_id
+      WHERE uf.follower_id = $1
+      ORDER BY c.created_at DESC
+      LIMIT 50
+    `, [id]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching feed:", err);
+    res.status(500).json({ message: "Error fetching feed" });
+  }
+};

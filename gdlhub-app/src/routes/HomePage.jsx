@@ -1,13 +1,60 @@
 import { useLoaderData, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 
 export default function RestaurantsPage() {
   const { restaurants, users } = useLoaderData();
+
+
+  const [feed, setFeed] = useState([]);
+
+  useEffect(() => {
+    // Simula que el usuario loggeado es el ID 1
+    fetch("http://localhost:3000/users/1/feed")
+      .then(res => res.json())
+      .then(setFeed);
+  }, []);
+
 
   return (
     <div className="space-y-6">
       <h1 className="text-4xl font-bold text-white text-center mb-10">
         Inicio
       </h1>
+
+      {feed.length > 0 && (
+        <>
+          <h2 className="text-2xl font-semibold text-white mt-8">Actividad reciente</h2>
+          <div className="space-y-4">
+            {feed.map((item) => (
+              <Link
+                key={item.comment_id}
+                to={`/restaurants/${item.restaurant_id}`}
+                className="block bg-neutral-700 p-4 rounded-xl hover:bg-neutral-600 transition-colors"
+              >
+                <div className="flex items-start gap-4">
+                  <img
+                    src={`http://localhost:3000/img/user/${item.avatar}`}
+                    alt={item.user_name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-400">
+                      <strong className="text-white">{item.user_name}</strong> comentó en{" "}
+                      <strong className="text-white">{item.restaurant_name}</strong>:
+                    </p>
+                    <p className="text-base text-gray-200 mt-1">{item.content}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(item.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+
 
       <h2 className="text-2xl font-semibold text-white">Usuarios que sigues</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
