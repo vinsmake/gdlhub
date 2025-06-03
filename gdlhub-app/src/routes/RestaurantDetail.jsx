@@ -52,6 +52,29 @@ export default function RestaurantDetail() {
     }
   });
 
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim()) return;
+
+    setSubmitting(true);
+    const res = await fetch(`http://localhost:3000/restaurants/${restaurant.id}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: newComment })
+    });
+
+    if (res.ok) {
+      const created = await res.json();
+      setComments((prev) => [created, ...prev]);
+      setNewComment("");
+    }
+
+    setSubmitting(false);
+  };
+
+
   return (
     <div className="bg-neutral-800 p-8 rounded-2xl shadow-xl text-white space-y-6 w-full max-w-7xl mx-auto px-4">
       <h2 className="text-4xl font-bold">{restaurant.name}</h2>
@@ -130,6 +153,25 @@ export default function RestaurantDetail() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Formulario para agregar comentario */}
+      <div className="mt-10 space-y-4">
+        <h3 className="text-2xl font-semibold text-white">Deja un comentario</h3>
+        <textarea
+          className="w-full p-3 bg-neutral-700 text-white rounded-xl focus:outline-none focus:ring focus:ring-red-500"
+          rows={3}
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Escribe tu opinión sobre este restaurante..."
+        />
+        <button
+          onClick={handleSubmitComment}
+          disabled={submitting}
+          className="bg-red-600 hover:bg-red-500 transition-colors text-white font-semibold py-2 px-6 rounded-xl"
+        >
+          {submitting ? "Enviando..." : "Publicar comentario"}
+        </button>
       </div>
 
       {/* comentarios */}

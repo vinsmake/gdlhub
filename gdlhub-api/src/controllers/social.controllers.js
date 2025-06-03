@@ -18,3 +18,25 @@ export const getRestaurantComments = async (req, res) => {
     res.status(500).json({ message: "Error retrieving comments" });
   }
 };
+
+export const addRestaurantComment = async (req, res) => {
+  const userId = 1; // Simulado: usuario loggeado
+  const { rid } = req.params;
+  const { content } = req.body;
+
+  if (!content || content.trim().length === 0) {
+    return res.status(400).json({ message: "El comentario no puede estar vacío." });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO comments (user_id, restaurant_id, content)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [userId, rid, content.trim()]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    res.status(500).json({ message: "Error al agregar comentario" });
+  }
+};
