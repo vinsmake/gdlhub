@@ -2,12 +2,23 @@ import { useLoaderData } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import { toPng } from "html-to-image";
 import { useRef } from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function RestaurantDetail() {
   const restaurant = useLoaderData();
   const publicUrl = import.meta.env.VITE_PUBLIC_URL;
   const restaurantUrl = `${publicUrl}/restaurants/${restaurant.id}`;
   const qrRef = useRef(null);
+
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/restaurants/${restaurant.id}/comments`)
+      .then(res => res.json())
+      .then(setComments);
+  }, [restaurant.id]);
+
 
   const handleDownload = async () => {
     if (!qrRef.current) return;
@@ -120,6 +131,31 @@ export default function RestaurantDetail() {
           </div>
         ))}
       </div>
+
+      {/* comentarios */}
+      {comments.length > 0 && (
+        <div className="mt-10">
+          <h3 className="text-2xl font-semibold text-white mb-4">Comentarios</h3>
+          <div className="space-y-4">
+            {comments.map((c) => (
+              <div key={c.id} className="bg-neutral-700 p-4 rounded-xl shadow-md text-white space-y-1">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={`http://localhost:3000/img/user/${c.avatar}`}
+                    alt={c.user_name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-medium text-white">{c.user_name}</p>
+                    <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300 mt-2">{c.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* QR con logo y fondo rojo */}
       <div className="mt-10 text-center space-y-4">
