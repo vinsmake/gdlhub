@@ -46,27 +46,65 @@ export const getUserFeed = async (req, res) => {
 
   try {
     const { rows } = await pool.query(`
+      -- Comentarios
       SELECT
-        c.id AS comment_id,
-        c.content,
+        'comment' AS type,
         c.created_at,
         u.id AS user_id,
         u.name AS user_name,
         u.avatar,
         r.id AS restaurant_id,
-        r.name AS restaurant_name
+        r.name AS restaurant_name,
+        c.content
       FROM user_follows uf
       JOIN users u ON u.id = uf.followed_id
       JOIN comments c ON c.user_id = u.id
       JOIN restaurants r ON r.id = c.restaurant_id
       WHERE uf.follower_id = $1
-      ORDER BY c.created_at DESC
+
+      UNION
+
+      -- Favoritos
+      SELECT
+        'favorite' AS type,
+        fr.created_at,
+        u.id AS user_id,
+        u.name AS user_name,
+        u.avatar,
+        r.id AS restaurant_id,
+        r.name AS restaurant_name,
+        NULL AS content
+      FROM user_follows uf
+      JOIN users u ON u.id = uf.followed_id
+      JOIN favorite_restaurants fr ON fr.user_id = u.id
+      JOIN restaurants r ON r.id = fr.restaurant_id
+      WHERE uf.follower_id = $1
+
+      UNION
+
+      -- Nuevos follows
+      SELECT
+        'followed' AS type,
+        uf2.created_at,
+        u1.id AS user_id,
+        u1.name AS user_name,
+        u1.avatar,
+        NULL AS restaurant_id,
+        NULL AS restaurant_name,
+        u2.name AS content  -- quien fue seguido
+      FROM user_follows uf
+      JOIN users u1 ON u1.id = uf.followed_id
+      JOIN user_follows uf2 ON uf2.follower_id = u1.id
+      JOIN users u2 ON u2.id = uf2.followed_id
+      WHERE uf.follower_id = $1
+
+      ORDER BY created_at DESC
       LIMIT 50
     `, [id]);
 
     res.json(rows);
   } catch (err) {
-    console.error("Error fetching feed:", err);
-    res.status(500).json({ message: "Error fetching feed" });
+    console.error("Error fetching full feed:", err);
+    res.status(500).json({ message: "Error retrieving feed" });
   }
 };
