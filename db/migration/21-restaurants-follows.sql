@@ -2,6 +2,9 @@
 INSERT INTO favorite_restaurants (user_id, restaurant_id) VALUES
   (1, 1),
   (1, 3),
+  (1, 5),
+  (1, 7),
+  (1, 9),
   (2, 2),
   (2, 3),
   (3, 1),
