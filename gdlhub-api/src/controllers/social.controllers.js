@@ -150,10 +150,10 @@ export const getFavoriteRestaurants = async (req, res) => {
   }
 };
 
-export const getGlobalFeed = async (_req, res) => {
+export const getGlobalFeed = async (req, res) => {
   try {
     const { rows } = await pool.query(`
-      -- Comentarios
+      -- Comentarios globales
       SELECT
         'comment' AS type,
         c.created_at,
@@ -162,14 +162,17 @@ export const getGlobalFeed = async (_req, res) => {
         u.avatar,
         r.id AS restaurant_id,
         r.name AS restaurant_name,
-        c.content
+        c.content,
+        r.image AS restaurant_image,
+        r.description AS restaurant_description,
+        r.address AS restaurant_address
       FROM comments c
       JOIN users u ON u.id = c.user_id
       JOIN restaurants r ON r.id = c.restaurant_id
 
       UNION
 
-      -- Favoritos
+      -- Favoritos globales
       SELECT
         'favorite' AS type,
         fr.created_at,
@@ -178,26 +181,32 @@ export const getGlobalFeed = async (_req, res) => {
         u.avatar,
         r.id AS restaurant_id,
         r.name AS restaurant_name,
-        NULL AS content
+        NULL AS content,
+        r.image AS restaurant_image,
+        r.description AS restaurant_description,
+        r.address AS restaurant_address
       FROM favorite_restaurants fr
       JOIN users u ON u.id = fr.user_id
       JOIN restaurants r ON r.id = fr.restaurant_id
 
       UNION
 
-      -- Follows
+      -- Follows globales
       SELECT
         'followed' AS type,
-        f.created_at,
+        uf.created_at,
         u1.id AS user_id,
         u1.name AS user_name,
         u1.avatar,
         NULL AS restaurant_id,
         NULL AS restaurant_name,
-        u2.name AS content
-      FROM user_follows f
-      JOIN users u1 ON u1.id = f.follower_id
-      JOIN users u2 ON u2.id = f.followed_id
+        u2.name AS content,
+        NULL AS restaurant_image,
+        NULL AS restaurant_description,
+        NULL AS restaurant_address
+      FROM user_follows uf
+      JOIN users u1 ON u1.id = uf.follower_id
+      JOIN users u2 ON u2.id = uf.followed_id
 
       ORDER BY created_at DESC
       LIMIT 50
@@ -205,7 +214,8 @@ export const getGlobalFeed = async (_req, res) => {
 
     res.json(rows);
   } catch (err) {
-    console.error("Error in global feed:", err);
-    res.status(500).json({ message: "Error retrieving global activity" });
+    console.error("Error fetching global feed:", err);
+    res.status(500).json({ message: "Error retrieving feed" });
   }
 };
+
