@@ -103,9 +103,7 @@ export default function RestaurantsPage() {
                             <p className="text-xs text-gray-500 italic">{item.restaurant_address}</p>
                           )}
 
-                          <p className="text-xs text-gray-500">
-                            {new Date(item.created_at).toLocaleString()}
-                          </p>
+
                         </div>
                       </div>
                     )}
