@@ -28,7 +28,7 @@ export const createUser = async (req, res) => {
         }
 
         console.log(error);
-        return res.status(500).json({ message: "Internal Server Error" });        
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 
 }
@@ -52,37 +52,45 @@ export const updateUser = async (req, res) => {
 }
 
 export const getUserRecommendations = async (req, res) => {
-  const { uid } = req.params;
+    const { uid } = req.params;
 
-  try {
-    const { rows } = await pool.query(
-      `
-      SELECT 
-        r2.restaurant_id,
-        res.name,
-        res.image,
-        ROUND(AVG(r2.rating), 1) AS avg_rating,
-        COUNT(*) AS similar_votes
-      FROM restaurant_ratings r1
-      JOIN restaurant_ratings r_common ON r1.user_id <> r_common.user_id
-        AND r1.restaurant_id = r_common.restaurant_id
-      JOIN restaurant_ratings r2 ON r_common.user_id = r2.user_id
-      JOIN restaurants res ON res.id = r2.restaurant_id
-      WHERE r1.user_id = $1
-        AND r2.restaurant_id NOT IN (
-          SELECT restaurant_id FROM restaurant_ratings WHERE user_id = $1
-        )
-      GROUP BY r2.restaurant_id, res.name, res.image
-      ORDER BY avg_rating DESC, similar_votes DESC
-      LIMIT 10;
+    try {
+        const { rows } = await pool.query(
+            `
+SELECT 
+  r2.restaurant_id,
+  res.name,
+  res.image,
+  ROUND(AVG(r2.rating), 1) AS avg_rating,
+  COUNT(DISTINCT r_common.user_id) AS similar_votes,
+  ARRAY_AGG(DISTINCT u.name) AS similar_users,
+  MIN(res_common.name) AS common_restaurant
+FROM restaurant_ratings r1
+JOIN restaurant_ratings r_common ON r1.user_id <> r_common.user_id
+  AND r1.restaurant_id = r_common.restaurant_id
+JOIN restaurant_ratings r2 ON r_common.user_id = r2.user_id
+JOIN restaurants res ON res.id = r2.restaurant_id
+JOIN restaurants res_common ON res_common.id = r_common.restaurant_id
+JOIN users u ON u.id = r_common.user_id
+WHERE r1.user_id = $1
+  AND r2.restaurant_id NOT IN (
+    SELECT restaurant_id FROM restaurant_ratings WHERE user_id = $1
+  )
+GROUP BY r2.restaurant_id, res.name, res.image
+ORDER BY avg_rating DESC, similar_votes DESC
+LIMIT 10;
+
+
       `,
-      [uid]
-    );
+            [uid]
+        );
 
-    res.json(rows);
-  } catch (err) {
-    console.error("Error in recommendation query:", err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
+        res.json(rows);
+    } catch (err) {
+        console.error("Error in recommendation query:", err.message); // mostrar mensaje claro
+        res.status(500).json({ message: err.message });
+    }
+
 };
+
 

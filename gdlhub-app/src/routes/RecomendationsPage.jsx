@@ -32,7 +32,25 @@ export const RecomendationsPage = () => {
                 className="w-full h-40 object-cover rounded-lg mb-4"
               />
               <h2 className="text-xl font-semibold text-white">{r.name}</h2>
-              <p className="text-sm text-gray-300">Calificación promedio: {r.avg_rating} ⭐</p>
+              <p className="text-sm text-gray-300">
+                Calificación promedio: {r.avg_rating} ⭐
+              </p>
+
+              {(() => {
+                const names = [...new Set(r.similar_users)].slice(0, 3);
+                const last = names.pop();
+                const usersText = names.length
+                  ? `${names.join(", ")} y ${last}`
+                  : last;
+
+                const verb = names.length === 0 ? "le gustó" : "les gustó";
+
+                return (
+                  <p className="text-sm text-gray-400 italic">
+                    Porque a {usersText} {verb} {r.common_restaurant}
+                  </p>
+                );
+              })()}
             </Link>
           ))}
         </div>
