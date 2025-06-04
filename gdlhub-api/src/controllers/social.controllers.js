@@ -55,7 +55,10 @@ export const getUserFeed = async (req, res) => {
         u.avatar,
         r.id AS restaurant_id,
         r.name AS restaurant_name,
-        c.content
+        c.content,
+        r.image AS restaurant_image,
+        r.description AS restaurant_description,
+        r.address AS restaurant_address
       FROM user_follows uf
       JOIN users u ON u.id = uf.followed_id
       JOIN comments c ON c.user_id = u.id
@@ -73,7 +76,10 @@ export const getUserFeed = async (req, res) => {
         u.avatar,
         r.id AS restaurant_id,
         r.name AS restaurant_name,
-        NULL AS content
+        NULL AS content,
+        r.image AS restaurant_image,
+        r.description AS restaurant_description,
+        r.address AS restaurant_address
       FROM user_follows uf
       JOIN users u ON u.id = uf.followed_id
       JOIN favorite_restaurants fr ON fr.user_id = u.id
@@ -91,7 +97,10 @@ export const getUserFeed = async (req, res) => {
         u1.avatar,
         NULL AS restaurant_id,
         NULL AS restaurant_name,
-        u2.name AS content  -- quien fue seguido
+        u2.name AS content,
+        NULL AS restaurant_image,
+        NULL AS restaurant_description,
+        NULL AS restaurant_address
       FROM user_follows uf
       JOIN users u1 ON u1.id = uf.followed_id
       JOIN user_follows uf2 ON uf2.follower_id = u1.id
@@ -108,6 +117,8 @@ export const getUserFeed = async (req, res) => {
     res.status(500).json({ message: "Error retrieving feed" });
   }
 };
+
+
 
 export const getFollowingUsers = async (req, res) => {
   const { id } = req.params;
