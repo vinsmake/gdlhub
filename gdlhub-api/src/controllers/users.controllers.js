@@ -50,3 +50,39 @@ export const updateUser = async (req, res) => {
     const result = await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [data.name, data.email, uid]);
     res.send("actualizando usuario con id: " + uid);
 }
+
+export const getUserRecommendations = async (req, res) => {
+  const { uid } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `
+      SELECT 
+        r2.restaurant_id,
+        res.name,
+        res.image,
+        ROUND(AVG(r2.rating), 1) AS avg_rating,
+        COUNT(*) AS similar_votes
+      FROM restaurant_ratings r1
+      JOIN restaurant_ratings r_common ON r1.user_id <> r_common.user_id
+        AND r1.restaurant_id = r_common.restaurant_id
+      JOIN restaurant_ratings r2 ON r_common.user_id = r2.user_id
+      JOIN restaurants res ON res.id = r2.restaurant_id
+      WHERE r1.user_id = $1
+        AND r2.restaurant_id NOT IN (
+          SELECT restaurant_id FROM restaurant_ratings WHERE user_id = $1
+        )
+      GROUP BY r2.restaurant_id, res.name, res.image
+      ORDER BY avg_rating DESC, similar_votes DESC
+      LIMIT 10;
+      `,
+      [uid]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error in recommendation query:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+

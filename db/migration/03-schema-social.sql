@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS favorite_restaurants (
   PRIMARY KEY (user_id, restaurant_id)
 );
 
-
-
 CREATE TABLE IF NOT EXISTS comments (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

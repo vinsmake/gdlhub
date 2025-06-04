@@ -51,3 +51,4 @@ CREATE TABLE IF NOT EXISTS menu_item_tags (
   tag_id INTEGER REFERENCES menu_tags(id) ON DELETE CASCADE,
   PRIMARY KEY (menu_item_id, tag_id)
 );
+

@@ -13,6 +13,7 @@ import HomePage from "./routes/HomePage";
 import RestaurantPost from "./routes/RestaurantPost";
 import RestaurantEdit from "./routes/RestaurantEdit";
 import { restaurantEditLoader } from "./loaders/restaurantEditLoader";
+import { RecomendationsPage } from "./routes/RecomendationsPage";
 
 
 const router = createBrowserRouter([
@@ -26,12 +27,8 @@ const router = createBrowserRouter([
       { path: "restaurants", element: <RestaurantsPage />, loader: restaurantsLoader },
       { path: "restaurants/:rid", element: <RestaurantDetail />, loader: restaurantDetailLoader },
       { path: "restaurants/new", element: <RestaurantPost /> },
-      {
-        path: "/restaurants/:rid/edit",
-        element: <RestaurantEdit />,
-        loader: restaurantEditLoader, 
-      }
-
+      { path: "/restaurants/:rid/edit", element: <RestaurantEdit />, loader: restaurantEditLoader, },
+      { path: "/recommendations", element: <RecomendationsPage /> }
     ],
   },
 ]);
