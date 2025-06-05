@@ -1,5 +1,6 @@
+import { API_BASE } from "@/config";
+
 export async function restaurantsLoader() {
-    const res = await fetch('http://localhost:3000/restaurants');
-    return res.json();
-  }
-  
+  const res = await fetch(`${API_BASE}/restaurants`);
+  return res.json();
+}

@@ -12,6 +12,7 @@ export default defineConfig({
     alias: {
       '@ui': path.resolve(__dirname, './src/components/ui'),
       '@common': path.resolve(__dirname, './src/components/common'),
+      '@': path.resolve(__dirname, "./src"),
     },
   },
   base: "https://gdlhub.app/",

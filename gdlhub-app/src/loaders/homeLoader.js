@@ -1,7 +1,9 @@
+import { API_BASE } from "@/config";
+
 export async function homeLoader() {
   const [usersRes, restaurantsRes] = await Promise.all([
-    fetch("http://localhost:3000/users/1/following"),
-    fetch("http://localhost:3000/users/1/favorite-restaurants")
+    fetch(`${API_BASE}/users/1/following`),
+    fetch(`${API_BASE}/users/1/favorite-restaurants`)
   ]);
 
   return {
