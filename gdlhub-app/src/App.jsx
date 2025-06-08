@@ -18,6 +18,7 @@ import { FollowsPage } from "./routes/FollowsPage";
 import { FriendsPage } from "./routes/FriendsPage";
 import { SavedPage } from "./routes/SavedPage";
 import { SearchPage } from "./routes/SearchPage";
+import CreateUserPage from "./routes/CreateUserPage";
 
 
 const router = createBrowserRouter([
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: "/", element: <HomePage />, loader: homeLoader },
+      { path: "users/create", element: <CreateUserPage /> },
       { path: "users", element: <UsersPage />, loader: usersLoader },
       { path: "users/:uid", element: <UserDetail />, loader: userDetailLoader },
       { path: "restaurants", element: <RestaurantsPage />, loader: restaurantsLoader },
