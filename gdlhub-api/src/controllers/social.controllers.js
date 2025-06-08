@@ -139,16 +139,25 @@ export const getFavoriteRestaurants = async (req, res) => {
   const { id } = req.params;
   try {
     const { rows } = await pool.query(`
-      SELECT r.*
+      SELECT 
+        r.*,
+        COALESCE(
+          json_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL),
+          '[]'
+        ) AS specialties
       FROM favorite_restaurants fr
       JOIN restaurants r ON r.id = fr.restaurant_id
+      LEFT JOIN specialties s ON s.restaurant_id = r.id
       WHERE fr.user_id = $1
+      GROUP BY r.id
     `, [id]);
+
     res.json(rows);
   } catch (err) {
     res.status(500).json({ message: "Error fetching favorite restaurants" });
   }
 };
+
 
 export const getGlobalFeed = async (req, res) => {
   try {
