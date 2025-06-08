@@ -263,3 +263,59 @@ export const updateRestaurant = async (req, res) => {
   }
 };
 
+export const getRestaurantsBySpecialties = async (req, res) => {
+  const { tags } = req.query; // Ejemplo: "birria,sushi"
+
+  if (!tags) return res.status(400).json({ message: "Faltan etiquetas de especialidad" });
+
+  const tagList = tags.split(",").map(t => t.trim().toLowerCase());
+
+  try {
+    const { rows } = await pool.query(`
+      SELECT r.*, ARRAY_AGG(s.name) AS specialties
+      FROM restaurants r
+      JOIN specialties s ON s.restaurant_id = r.id
+      WHERE LOWER(s.name) = ANY($1)
+      GROUP BY r.id
+    `, [tagList]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error buscando restaurantes por especialidad:", error);
+    res.status(500).json({ message: "Error buscando restaurantes" });
+  }
+};
+
+export const searchRestaurants = async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.trim().length === 0) {
+    return res.status(400).json({ message: "Falta término de búsqueda" });
+  }
+
+  try {
+    const { rows } = await pool.query(`
+      SELECT 
+        r.id, r.name, r.description, r.address, r.maps, r.image, r.created_at,
+        COALESCE(
+          json_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL),
+          '[]'
+        ) AS specialties
+      FROM restaurants r
+      LEFT JOIN specialties s ON s.restaurant_id = r.id
+      LEFT JOIN menu_items mi ON mi.restaurant_id = r.id
+      WHERE
+        LOWER(s.name) LIKE LOWER($1)
+        OR LOWER(mi.name) LIKE LOWER($1)
+        OR LOWER(r.name) LIKE LOWER($1)
+      GROUP BY r.id, r.name, r.description, r.address, r.maps, r.image, r.created_at
+    `, [`%${q.trim()}%`]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("🔴 Error en búsqueda:", err.message);
+    res.status(500).json({ message: "Error al buscar", error: err.message });
+  }
+};
+
+
+

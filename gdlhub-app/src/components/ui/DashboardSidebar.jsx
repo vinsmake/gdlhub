@@ -94,6 +94,15 @@ export const DashboardSidebar = () => {
                         <Bookmark size={24} /> Guardado
                     </NavLink>
 
+                    <NavLink
+                        to="/search"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
+                        <Eye size={24} /> Busqueda
+                    </NavLink>
+
                     <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                         <List size={24} /> Categorías
                     </a>
