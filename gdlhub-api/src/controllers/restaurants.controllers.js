@@ -293,6 +293,8 @@ export const searchRestaurants = async (req, res) => {
   }
 
   try {
+    const search = `%${q.trim()}%`;
+
     const { rows } = await pool.query(`
       SELECT 
         r.id, r.name, r.description, r.address, r.maps, r.image, r.created_at,
@@ -304,11 +306,11 @@ export const searchRestaurants = async (req, res) => {
       LEFT JOIN specialties s ON s.restaurant_id = r.id
       LEFT JOIN menu_items mi ON mi.restaurant_id = r.id
       WHERE
-        LOWER(s.name) LIKE LOWER($1)
-        OR LOWER(mi.name) LIKE LOWER($1)
-        OR LOWER(r.name) LIKE LOWER($1)
+        unaccent(LOWER(s.name)) LIKE unaccent(LOWER($1))
+        OR unaccent(LOWER(mi.name)) LIKE unaccent(LOWER($1))
+        OR unaccent(LOWER(r.name)) LIKE unaccent(LOWER($1))
       GROUP BY r.id, r.name, r.description, r.address, r.maps, r.image, r.created_at
-    `, [`%${q.trim()}%`]);
+    `, [search]);
 
     res.json(rows);
   } catch (err) {
@@ -316,6 +318,7 @@ export const searchRestaurants = async (req, res) => {
     res.status(500).json({ message: "Error al buscar", error: err.message });
   }
 };
+
 
 
 
