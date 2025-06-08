@@ -1,5 +1,5 @@
 import express from "express";
-import { getRestaurantComments } from "../controllers/social.controllers.js";
+import { getMutualFeed, getRestaurantComments } from "../controllers/social.controllers.js";
 import { addRestaurantComment } from "../controllers/social.controllers.js";
 import { getUserFeed } from "../controllers/social.controllers.js";
 import { getFollowingUsers, getFavoriteRestaurants } from "../controllers/social.controllers.js";
@@ -15,6 +15,8 @@ router.get("/users/:id/feed", getUserFeed);
 router.get("/users/:id/following", getFollowingUsers);
 router.get("/users/:id/favorite-restaurants", getFavoriteRestaurants);
 router.get("/feed", getGlobalFeed);
+router.get("/users/:id/friends", getMutualFeed);
+
 
 
 export default router;

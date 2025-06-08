@@ -219,3 +219,65 @@ export const getGlobalFeed = async (req, res) => {
   }
 };
 
+export const getMutualFeed = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows } = await pool.query(`
+      WITH mutuals AS (
+        SELECT uf1.followed_id AS friend_id
+        FROM user_follows uf1
+        JOIN user_follows uf2
+          ON uf1.followed_id = uf2.follower_id
+         AND uf1.follower_id = uf2.followed_id
+        WHERE uf1.follower_id = $1
+      )
+
+      -- Comentarios
+      SELECT
+        'comment' AS type,
+        c.created_at,
+        u.id AS user_id,
+        u.name AS user_name,
+        u.avatar,
+        r.id AS restaurant_id,
+        r.name AS restaurant_name,
+        c.content,
+        r.image AS restaurant_image,
+        r.description AS restaurant_description,
+        r.address AS restaurant_address
+      FROM mutuals m
+      JOIN users u ON u.id = m.friend_id
+      JOIN comments c ON c.user_id = u.id
+      JOIN restaurants r ON r.id = c.restaurant_id
+
+      UNION
+
+      -- Favoritos
+      SELECT
+        'favorite' AS type,
+        fr.created_at,
+        u.id AS user_id,
+        u.name AS user_name,
+        u.avatar,
+        r.id AS restaurant_id,
+        r.name AS restaurant_name,
+        NULL AS content,
+        r.image AS restaurant_image,
+        r.description AS restaurant_description,
+        r.address AS restaurant_address
+      FROM mutuals m
+      JOIN users u ON u.id = m.friend_id
+      JOIN favorite_restaurants fr ON fr.user_id = u.id
+      JOIN restaurants r ON r.id = fr.restaurant_id
+
+      ORDER BY created_at DESC
+      LIMIT 50
+    `, [id]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching mutual feed:", err);
+    res.status(500).json({ message: "Error retrieving mutual feed" });
+  }
+};
