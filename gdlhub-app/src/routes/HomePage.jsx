@@ -1,5 +1,6 @@
 import { useLoaderData, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useUser } from "../context/UserContext";
 
 export default function RestaurantsPage() {
   const { restaurants, users } = useLoaderData();
@@ -11,8 +12,17 @@ export default function RestaurantsPage() {
       .then(setFeed);
   }, []);
 
+  const { user } = useUser();
+
+
   return (
     <div className="space-y-6">
+      {user && (
+        <div className="text-right text-gray-400 text-sm">
+          Bienvenido, <span className="font-semibold text-white">{user.name}</span>
+        </div>
+      )}
+
       <h1 className="text-4xl font-bold text-white text-center mb-10">
         Inicio
       </h1>

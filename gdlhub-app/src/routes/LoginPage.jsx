@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { login } = useUser(); // ← usamos el contexto aquí
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,8 +29,8 @@ export default function LoginPage() {
     }
 
     const user = await res.json();
-    localStorage.setItem("user", JSON.stringify(user));
-    navigate("/"); // redirige al home
+    login(user); // ← Guardamos en contexto y localStorage automáticamente
+    navigate("/");
   };
 
   return (
