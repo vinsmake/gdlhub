@@ -52,11 +52,11 @@ export const updateUser = async (req, res) => {
 }
 
 export const getUserRecommendations = async (req, res) => {
-    const { uid } = req.params;
+  const { uid } = req.params;
 
-    try {
-        const { rows } = await pool.query(
-            `
+  try {
+    const { rows } = await pool.query(
+      `
 SELECT 
   r2.restaurant_id,
   res.name,
@@ -64,7 +64,12 @@ SELECT
   ROUND(AVG(r2.rating), 1) AS avg_rating,
   COUNT(DISTINCT r_common.user_id) AS similar_votes,
   ARRAY_AGG(DISTINCT u.name) AS similar_users,
-  MIN(res_common.name) AS common_restaurant
+  MIN(res_common.name) AS common_restaurant,
+  (
+    SELECT COALESCE(json_agg(s.name), '[]')
+    FROM specialties s
+    WHERE s.restaurant_id = res.id
+  ) AS specialties
 FROM restaurant_ratings r1
 JOIN restaurant_ratings r_common ON r1.user_id <> r_common.user_id
   AND r1.restaurant_id = r_common.restaurant_id
@@ -76,21 +81,19 @@ WHERE r1.user_id = $1
   AND r2.restaurant_id NOT IN (
     SELECT restaurant_id FROM restaurant_ratings WHERE user_id = $1
   )
-GROUP BY r2.restaurant_id, res.name, res.image
+GROUP BY r2.restaurant_id, res.id
 ORDER BY avg_rating DESC, similar_votes DESC
 LIMIT 10;
-
-
       `,
-            [uid]
-        );
+      [uid]
+    );
 
-        res.json(rows);
-    } catch (err) {
-        console.error("Error in recommendation query:", err.message); // mostrar mensaje claro
-        res.status(500).json({ message: err.message });
-    }
-
+    res.json(rows);
+  } catch (err) {
+    console.error("Error in recommendation query:", err.message);
+    res.status(500).json({ message: err.message });
+  }
 };
+
 
 

@@ -36,6 +36,19 @@ export const RecomendationsPage = () => {
                 Calificación promedio: {r.avg_rating} ⭐
               </p>
 
+              {Array.isArray(r.specialties) && r.specialties.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {r.specialties.map((sp, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs bg-red-600 text-white px-2 py-1 rounded-full"
+                    >
+                      {sp}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {(() => {
                 const names = [...new Set(r.similar_users)].slice(0, 3);
                 const last = names.pop();
@@ -46,7 +59,7 @@ export const RecomendationsPage = () => {
                 const verb = names.length === 0 ? "le gustó" : "les gustó";
 
                 return (
-                  <p className="text-sm text-gray-400 italic">
+                  <p className="text-sm text-gray-400 italic mt-2">
                     Porque a {usersText} {verb} {r.common_restaurant}
                   </p>
                 );
