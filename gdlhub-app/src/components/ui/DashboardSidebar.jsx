@@ -85,9 +85,14 @@ export const DashboardSidebar = () => {
                         <HandHeart size={24} /> Amigos
                     </NavLink>
 
-                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                        <Bookmark size={24} /> Guardados
-                    </a>
+                    <NavLink
+                        to="/saved"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
+                        <Bookmark size={24} /> Guardado
+                    </NavLink>
 
                     <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                         <List size={24} /> Categorías
