@@ -290,3 +290,51 @@ export const getMutualFeed = async (req, res) => {
     res.status(500).json({ message: "Error retrieving mutual feed" });
   }
 };
+
+export const followUser = async (req, res) => {
+  const followerId = 1; // Simulado
+  const { id } = req.params;
+
+  if (parseInt(id) === followerId) {
+    return res.status(400).json({ message: "No puedes seguirte a ti mismo" });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO user_follows (follower_id, followed_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      [followerId, id]
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error("Error al seguir usuario:", err);
+    res.status(500).json({ message: "Error interno" });
+  }
+};
+
+export const unfollowUser = async (req, res) => {
+  const followerId = 1; // Simulado
+  const { id } = req.params;
+
+  try {
+    await pool.query(
+      `DELETE FROM user_follows WHERE follower_id = $1 AND followed_id = $2`,
+      [followerId, id]
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error("Error al dejar de seguir:", err);
+    res.status(500).json({ message: "Error interno" });
+  }
+};
+
+export const isFollowing = async (req, res) => {
+  const followerId = 1;
+  const { id } = req.params;
+
+  const { rowCount } = await pool.query(
+    `SELECT 1 FROM user_follows WHERE follower_id = $1 AND followed_id = $2`,
+    [followerId, id]
+  );
+
+  res.json({ following: rowCount > 0 });
+};
