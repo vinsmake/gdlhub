@@ -19,6 +19,7 @@ import { FriendsPage } from "./routes/FriendsPage";
 import { SavedPage } from "./routes/SavedPage";
 import { SearchPage } from "./routes/SearchPage";
 import CreateUserPage from "./routes/CreateUserPage";
+import LoginPage from "./routes/LoginPage";
 
 
 const router = createBrowserRouter([
@@ -38,7 +39,9 @@ const router = createBrowserRouter([
       { path: "/follows", element: <FollowsPage /> },
       { path: "/friends", element: <FriendsPage /> },
       { path: "/saved", element: <SavedPage /> },
-      { path: "/search", element: <SearchPage /> }
+      { path: "/search", element: <SearchPage /> },
+      { path: "login", element: <LoginPage /> }
+
     ],
   },
 ]);

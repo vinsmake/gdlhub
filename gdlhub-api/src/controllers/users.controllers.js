@@ -1,4 +1,6 @@
 import { pool } from "../db.js";
+import bcrypt from "bcrypt";
+
 
 
 export const getUsers = async (req, res) => {
@@ -16,22 +18,29 @@ export const getUserById = async (req, res) => {
 }
 
 export const createUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-    try {
-        const data = req.body;
-        const { rows } = await pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [data.name, data.email]);
-        return res.json(rows[0]);
-    } catch (error) {
-
-        if (error?.code === '23505') {
-            return res.status(409).json({ message: "Email already registered" });
-        }
-
-        console.log(error);
-        return res.status(500).json({ message: "Internal Server Error" });
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres." });
     }
 
-}
+    const hash = await bcrypt.hash(password, 10);
+
+    const { rows } = await pool.query(
+      `INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, avatar`,
+      [name, email, hash]
+    );
+
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    if (error.code === '23505') {
+      return res.status(409).json({ message: "Email ya registrado" });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+};
 
 export const deleteUser = async (req, res) => {
     const { uid } = req.params;
@@ -95,5 +104,30 @@ LIMIT 10;
   }
 };
 
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
+  try {
+    const { rows } = await pool.query(
+      `SELECT * FROM users WHERE email = $1`,
+      [email]
+    );
 
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "Usuario no encontrado" });
+    }
+
+    const user = rows[0];
+
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
+    }
+
+    // Simulación de login — más adelante usaremos JWT o sesiones
+    res.json({ id: user.id, name: user.name, email: user.email, avatar: user.avatar });
+  } catch (err) {
+    console.error("Error al hacer login:", err);
+    res.status(500).json({ message: "Error interno" });
+  }
+};
