@@ -32,7 +32,7 @@ export const SearchPage = () => {
 
       <input
         type="text"
-        placeholder="Ej. café, enchiladas, latte..."
+        placeholder="Ej. café, waffle, latte..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="w-full max-w-xl mx-auto block px-4 py-2 rounded-xl bg-neutral-700 text-white placeholder-gray-400"
