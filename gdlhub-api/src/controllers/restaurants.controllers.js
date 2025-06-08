@@ -1,9 +1,27 @@
 import { pool } from "../db.js";
 
 export const getRestaurants = async (req, res) => {
-  const { rows } = await pool.query("SELECT * FROM restaurants");
-  res.json(rows);
+  try {
+    const { rows } = await pool.query(`
+      SELECT 
+        r.*,
+        COALESCE(
+          json_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL),
+          '[]'
+        ) AS specialties
+      FROM restaurants r
+      LEFT JOIN specialties s ON s.restaurant_id = r.id
+      GROUP BY r.id
+      ORDER BY r.name
+    `);
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error al obtener restaurantes:", error.message);
+    res.status(500).json({ message: "Error al obtener restaurantes" });
+  }
 };
+
 
 export const getRestaurantById = async (req, res) => {
   const { rid } = req.params;

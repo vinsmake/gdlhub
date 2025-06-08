@@ -29,6 +29,19 @@ export default function RestaurantsPage() {
                 <h2 className="text-2xl font-semibold text-white">{r.name}</h2>
                 <p className="text-sm text-gray-300">{r.description}</p>
                 <p className="text-sm text-gray-400">{r.address}</p>
+
+                {Array.isArray(r.specialties) && r.specialties.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {r.specialties.map((sp, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-red-600 text-white px-2 py-1 rounded-full"
+                      >
+                        {sp}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
