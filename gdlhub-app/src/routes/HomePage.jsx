@@ -184,6 +184,19 @@ export default function RestaurantsPage() {
               </div>
             </div>
 
+            {Array.isArray(r.specialties) && r.specialties.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {r.specialties.map((sp, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs bg-red-600 text-white px-2 py-1 rounded-full"
+                  >
+                    {sp}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <div className="mt-2">
               <iframe
                 src={r.maps}
@@ -198,6 +211,7 @@ export default function RestaurantsPage() {
             </div>
           </Link>
         ))}
+
       </div>
 
     </div>
