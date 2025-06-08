@@ -11,3 +11,5 @@ VALUES
   ('Fernando Reyes', 'fernando@example.com', 'pc8.jpg'),
   ('Ricardo Herrera', 'ricardo@example.com', 'pc9.jpg'),
   ('Ana Morales', 'ana@example.com', 'pc10.jpg');
+
+ALTER TABLE users ADD COLUMN password_hash TEXT;
