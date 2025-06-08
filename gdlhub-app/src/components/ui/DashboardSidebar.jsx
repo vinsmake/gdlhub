@@ -13,7 +13,7 @@ import {
     Utensils,
     Earth,
     HandHeart,
-    
+
 } from "lucide-react";
 
 import { data } from "../../data";
@@ -75,6 +75,15 @@ export const DashboardSidebar = () => {
                     >
                         <Heart size={24} /> Seguidos
                     </NavLink>
+                    
+                    <NavLink
+                        to="/friends"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
+                        <HandHeart size={24} /> Amigos
+                    </NavLink>
 
                     <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                         <Bookmark size={24} /> Guardados
@@ -90,9 +99,6 @@ export const DashboardSidebar = () => {
                         <MapPin size={24} /> Mapa
                     </a>
 
-                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-                        <HandHeart size={24} /> Amigos
-                    </a>
                     <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                         <Settings size={24} /> Configuración
                     </a>
