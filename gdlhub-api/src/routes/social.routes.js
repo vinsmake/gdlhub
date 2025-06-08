@@ -1,5 +1,5 @@
 import express from "express";
-import { followUser, getMutualFeed, getRestaurantComments, isFollowing, unfollowUser } from "../controllers/social.controllers.js";
+import { followUser, getMutualFeed, getRestaurantComments, isFollowing, isSavedRestaurant, saveRestaurant, unfollowUser, unsaveRestaurant } from "../controllers/social.controllers.js";
 import { addRestaurantComment } from "../controllers/social.controllers.js";
 import { getUserFeed } from "../controllers/social.controllers.js";
 import { getFollowingUsers, getFavoriteRestaurants } from "../controllers/social.controllers.js";
@@ -19,7 +19,9 @@ router.get("/users/:id/friends", getMutualFeed);
 router.post("/users/:id/follow", followUser);
 router.delete("/users/:id/follow", unfollowUser);
 router.get("/users/:id/follow", isFollowing);
-
+router.post("/restaurants/:rid/save", saveRestaurant);
+router.delete("/restaurants/:rid/save", unsaveRestaurant);
+router.get("/restaurants/:rid/save", isSavedRestaurant);
 
 
 export default router;

@@ -74,18 +74,33 @@ export default function RestaurantDetail() {
     setSubmitting(false);
   };
 
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/restaurants/${restaurant.id}/save`)
+      .then(res => res.json())
+      .then(data => setSaved(data.saved));
+  }, [restaurant.id]);
+
+  const handleToggleSave = () => {
+    fetch(`http://localhost:3000/restaurants/${restaurant.id}/save`, {
+      method: saved ? "DELETE" : "POST"
+    }).then(() => setSaved(!saved));
+  };
+
+
 
   return (
     <div className="bg-neutral-800 p-8 rounded-2xl shadow-xl text-white space-y-6 w-full max-w-7xl mx-auto px-4">
       <h2 className="text-4xl font-bold">{restaurant.name}</h2>
       {restaurant.image && (
-<div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
-  <img
-    src={`http://localhost:3000/img/restaurant/${restaurant.image}`}
-    alt={restaurant.name}
-    className="w-full h-full object-cover"
-  />
-</div>
+        <div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
+          <img
+            src={`http://localhost:3000/img/restaurant/${restaurant.image}`}
+            alt={restaurant.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
 
 
       )}
@@ -128,6 +143,18 @@ export default function RestaurantDetail() {
           </ul>
         </div>
       )}
+
+      {/* Botón de guardar/quitar restaurante */}
+      <div className="mt-4">
+        <button
+          onClick={handleToggleSave}
+          className={`px-4 py-2 rounded font-semibold transition ${saved ? "bg-gray-600 hover:bg-gray-500" : "bg-red-600 hover:bg-red-500"
+            }`}
+        >
+          {saved ? "Quitar de favoritos" : "Guardar restaurante"}
+        </button>
+      </div>
+
 
       {/* MENÚ agrupado por categoría */}
       <div className="space-y-10 mt-6">

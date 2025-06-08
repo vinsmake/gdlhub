@@ -338,3 +338,45 @@ export const isFollowing = async (req, res) => {
 
   res.json({ following: rowCount > 0 });
 };
+
+export const saveRestaurant = async (req, res) => {
+  const userId = 1;
+  const { rid } = req.params;
+
+  try {
+    await pool.query(
+      `INSERT INTO favorite_restaurants (user_id, restaurant_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      [userId, rid]
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ message: "Error al guardar restaurante" });
+  }
+};
+
+export const unsaveRestaurant = async (req, res) => {
+  const userId = 1;
+  const { rid } = req.params;
+
+  try {
+    await pool.query(
+      `DELETE FROM favorite_restaurants WHERE user_id = $1 AND restaurant_id = $2`,
+      [userId, rid]
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ message: "Error al eliminar favorito" });
+  }
+};
+
+export const isSavedRestaurant = async (req, res) => {
+  const userId = 1;
+  const { rid } = req.params;
+
+  const { rowCount } = await pool.query(
+    `SELECT 1 FROM favorite_restaurants WHERE user_id = $1 AND restaurant_id = $2`,
+    [userId, rid]
+  );
+
+  res.json({ saved: rowCount > 0 });
+};
