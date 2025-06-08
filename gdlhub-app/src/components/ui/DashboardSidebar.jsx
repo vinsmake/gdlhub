@@ -67,9 +67,15 @@ export const DashboardSidebar = () => {
                         <Earth size={24} /> Comunidad
                     </NavLink>
 
-                    <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+                    <NavLink
+                        to="/follows"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+                        }
+                    >
                         <Heart size={24} /> Seguidos
-                    </a>
+                    </NavLink>
+
                     <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
                         <Bookmark size={24} /> Guardados
                     </a>

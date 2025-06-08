@@ -14,6 +14,7 @@ import RestaurantPost from "./routes/RestaurantPost";
 import RestaurantEdit from "./routes/RestaurantEdit";
 import { restaurantEditLoader } from "./loaders/restaurantEditLoader";
 import { RecomendationsPage } from "./routes/RecomendationsPage";
+import { FollowsPage } from "./routes/FollowsPage";
 
 
 const router = createBrowserRouter([
@@ -28,7 +29,8 @@ const router = createBrowserRouter([
       { path: "restaurants/:rid", element: <RestaurantDetail />, loader: restaurantDetailLoader },
       { path: "restaurants/new", element: <RestaurantPost /> },
       { path: "/restaurants/:rid/edit", element: <RestaurantEdit />, loader: restaurantEditLoader, },
-      { path: "/recommendations", element: <RecomendationsPage /> }
+      { path: "/recommendations", element: <RecomendationsPage /> },
+      { path: "/follows", element: <FollowsPage /> }
     ],
   },
 ]);
