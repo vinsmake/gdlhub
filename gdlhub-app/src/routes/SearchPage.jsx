@@ -15,7 +15,6 @@ export const SearchPage = () => {
       fetch(`http://localhost:3000/restaurants/search?q=${encodeURIComponent(query)}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log("Resultados:", data);
           setResults(data);
         })
         .catch((err) => {
@@ -45,16 +44,36 @@ export const SearchPage = () => {
             <Link
               key={r.id}
               to={`/restaurants/${r.id}`}
-              className="bg-neutral-700 p-4 rounded-2xl shadow-lg hover:bg-neutral-600 transition-colors"
+              className="bg-neutral-700 p-4 rounded-2xl shadow-lg hover:bg-neutral-600 transition-colors space-y-3"
             >
-              <h2 className="text-xl font-semibold text-white">{r.name}</h2>
-              <p className="text-sm text-gray-300">{r.description}</p>
-              <p className="text-sm text-gray-400">{r.address}</p>
-              {Array.isArray(r.specialties) && r.specialties.length > 0 && (
-                <p className="text-xs text-gray-500 italic mt-1">
-                  Especialidades: {r.specialties.join(", ")}
-                </p>
-              )}
+              <div className="flex items-center gap-4">
+                {r.image && (
+                  <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
+                    <img
+                      src={`http://localhost:3000/img/restaurant/${r.image}`}
+                      alt={r.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">{r.name}</h2>
+                  <p className="text-sm text-gray-300">{r.description}</p>
+                  <p className="text-sm text-gray-400">{r.address}</p>
+                  {Array.isArray(r.specialties) && r.specialties.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {r.specialties.map((sp, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs bg-red-600 text-white px-2 py-1 rounded-full"
+                        >
+                          {sp}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </Link>
           ))}
         </div>
