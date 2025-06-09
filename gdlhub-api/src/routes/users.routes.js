@@ -7,19 +7,10 @@ const router = Router();
 /* Routes */
 /* Get users */
 router.get("/users", getUsers);
-
-/* Get users by id */
 router.get("/users/:uid", getUserById);
-
-/* Create user */
 router.post("/users", createUser);
-
-/* Delete user */
 router.delete("/users/:uid", deleteUser);
-
-/* Put users */
 router.put("/users/:uid", updateUser);
-
 router.get("/users/:uid/recommendations", getUserRecommendations);
 router.post("/login", loginUser);
 
