@@ -17,6 +17,7 @@ export default function RestaurantDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [showCommentLoginMessage, setShowCommentLoginMessage] = useState(false);
 
   const { user, token } = useUser();
 
@@ -59,12 +60,20 @@ export default function RestaurantDetail() {
   };
 
   const handleSubmitComment = async () => {
+    if (!user || !token) {
+      setShowCommentLoginMessage(true);
+      return;
+    }
+
     if (!newComment.trim()) return;
 
     setSubmitting(true);
     const res = await fetch(`${API_BASE}/restaurants/${rid}/comments`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ content: newComment })
     });
 
@@ -147,10 +156,7 @@ export default function RestaurantDetail() {
           <h3 className="text-2xl font-semibold mt-6">Especialidades</h3>
           <ul className="mt-2 flex flex-col lg:flex-row lg:flex-wrap gap-2 text-gray-300 list-disc list-inside lg:list-none">
             {restaurant.specialties.map((item, idx) => (
-              <li
-                key={idx}
-                className="lg:before:content-['•'] lg:before:mr-2 lg:list-none"
-              >
+              <li key={idx} className="lg:before:content-['•'] lg:before:mr-2 lg:list-none">
                 {item}
               </li>
             ))}
@@ -223,6 +229,9 @@ export default function RestaurantDetail() {
         >
           {submitting ? "Enviando..." : "Publicar comentario"}
         </button>
+        {showCommentLoginMessage && (
+          <p className="text-sm text-red-400">Debes iniciar sesión para dejar un comentario.</p>
+        )}
       </div>
 
       {comments.length > 0 && (

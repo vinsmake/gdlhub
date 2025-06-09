@@ -1,5 +1,6 @@
 import { pool } from "../db.js";
 
+
 // Obtener comentarios de un restaurante
 export const getRestaurantComments = async (req, res) => {
   const { rid } = req.params;
@@ -20,10 +21,11 @@ export const getRestaurantComments = async (req, res) => {
 };
 
 export const addRestaurantComment = async (req, res) => {
-  const userId = 1; // Simulado: usuario loggeado
+  const userId = req.user?.id;
   const { rid } = req.params;
   const { content } = req.body;
 
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
   if (!content || content.trim().length === 0) {
     return res.status(400).json({ message: "El comentario no puede estar vacío." });
   }
@@ -292,7 +294,7 @@ export const getMutualFeed = async (req, res) => {
 };
 
 export const followUser = async (req, res) => {
-  const followerId = 1; // Simulado
+  const followerId = req.user.id;
   const { id } = req.params;
 
   if (parseInt(id) === followerId) {
@@ -311,8 +313,9 @@ export const followUser = async (req, res) => {
   }
 };
 
+
 export const unfollowUser = async (req, res) => {
-  const followerId = 1; // Simulado
+  const followerId = req.user.id;
   const { id } = req.params;
 
   try {
@@ -327,36 +330,49 @@ export const unfollowUser = async (req, res) => {
   }
 };
 
+
 export const isFollowing = async (req, res) => {
-  const followerId = 1;
+  const followerId = req.user.id;
   const { id } = req.params;
 
-  const { rowCount } = await pool.query(
-    `SELECT 1 FROM user_follows WHERE follower_id = $1 AND followed_id = $2`,
-    [followerId, id]
-  );
-
-  res.json({ following: rowCount > 0 });
+  try {
+    const { rowCount } = await pool.query(
+      `SELECT 1 FROM user_follows WHERE follower_id = $1 AND followed_id = $2`,
+      [followerId, id]
+    );
+    res.json({ following: rowCount > 0 });
+  } catch (err) {
+    console.error("Error al verificar follow:", err);
+    res.status(500).json({ message: "Error interno" });
+  }
 };
 
+
 export const saveRestaurant = async (req, res) => {
-  const userId = 1;
+  const userId = req.user?.id;
   const { rid } = req.params;
+
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
 
   try {
     await pool.query(
-      `INSERT INTO favorite_restaurants (user_id, restaurant_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      `INSERT INTO favorite_restaurants (user_id, restaurant_id) 
+       VALUES ($1, $2) ON CONFLICT DO NOTHING`,
       [userId, rid]
     );
     res.sendStatus(204);
   } catch (err) {
+    console.error("Error al guardar restaurante:", err);
     res.status(500).json({ message: "Error al guardar restaurante" });
   }
 };
 
+
 export const unsaveRestaurant = async (req, res) => {
-  const userId = 1;
+  const userId = req.user?.id;
   const { rid } = req.params;
+
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
 
   try {
     await pool.query(
@@ -365,18 +381,27 @@ export const unsaveRestaurant = async (req, res) => {
     );
     res.sendStatus(204);
   } catch (err) {
+    console.error("Error al eliminar favorito:", err);
     res.status(500).json({ message: "Error al eliminar favorito" });
   }
 };
 
+
 export const isSavedRestaurant = async (req, res) => {
-  const userId = 1;
+  const userId = req.user?.id;
   const { rid } = req.params;
 
-  const { rowCount } = await pool.query(
-    `SELECT 1 FROM favorite_restaurants WHERE user_id = $1 AND restaurant_id = $2`,
-    [userId, rid]
-  );
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
 
-  res.json({ saved: rowCount > 0 });
+  try {
+    const { rowCount } = await pool.query(
+      `SELECT 1 FROM favorite_restaurants WHERE user_id = $1 AND restaurant_id = $2`,
+      [userId, rid]
+    );
+    res.json({ saved: rowCount > 0 });
+  } catch (err) {
+    console.error("Error al verificar favorito:", err);
+    res.status(500).json({ message: "Error interno" });
+  }
 };
+
