@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+
 
 export const FollowsPage = () => {
   const [feed, setFeed] = useState([]);
+  const { user } = useUser();
+
 
   useEffect(() => {
-    // Simula que el usuario loggeado es el ID 1
-    fetch("http://localhost:3000/users/1/feed")
+    if (!user) return;
+    fetch(`http://localhost:3000/users/${user.id}/feed`)
       .then(res => res.json())
       .then(setFeed);
-  }, []);
+  }, [user]);
 
   return (
     <div className="space-y-6 p-6">

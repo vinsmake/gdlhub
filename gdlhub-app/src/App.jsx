@@ -9,7 +9,6 @@ import { userDetailLoader } from "./loaders/userDetailLoader";
 import { restaurantsLoader } from "./loaders/restaurantsLoaders";
 import { restaurantDetailLoader } from "./loaders/restaurantDetailLoaders";
 import { homeLoader } from "./loaders/homeLoader";
-import HomePage from "./routes/HomePage";
 import RestaurantPost from "./routes/RestaurantPost";
 import RestaurantEdit from "./routes/RestaurantEdit";
 import { restaurantEditLoader } from "./loaders/restaurantEditLoader";
@@ -20,6 +19,7 @@ import { SavedPage } from "./routes/SavedPage";
 import { SearchPage } from "./routes/SearchPage";
 import CreateUserPage from "./routes/CreateUserPage";
 import LoginPage from "./routes/LoginPage";
+import { HomePage } from "./routes/HomePage";
 
 
 const router = createBrowserRouter([

@@ -2,18 +2,17 @@ import { useLoaderData, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 
-export default function RestaurantsPage() {
+export const HomePage = () => {
   const { restaurants, users } = useLoaderData();
   const [feed, setFeed] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:3000/users/1/feed")
-      .then(res => res.json())
-      .then(setFeed);
-  }, []);
-
   const { user } = useUser();
 
+  useEffect(() => {
+    if (!user) return;
+    fetch(`http://localhost:3000/users/${user.id}/feed`)
+      .then(res => res.json())
+      .then(setFeed);
+  }, [user]);
 
   return (
     <div className="space-y-6">

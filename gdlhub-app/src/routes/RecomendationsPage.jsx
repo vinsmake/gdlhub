@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export const RecomendationsPage = () => {
   const [recommendations, setRecommendations] = useState([]);
-  const userId = 1; // temporal o desde contexto/autenticación
+  const { user } = useUser();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/users/${userId}/recommendations`)
+    if (!user) return;
+    fetch(`http://localhost:3000/users/${user.id}/recommendations`)
       .then((res) => res.json())
       .then(setRecommendations)
       .catch((err) => console.error("Error fetching recommendations:", err));
-  }, [userId]);
+  }, [user]);
 
   return (
     <div className="space-y-6 p-6">

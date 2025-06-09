@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export const FriendsPage = () => {
   const [feed, setFeed] = useState([]);
-  const userId = 1; // Reemplaza por auth cuando esté listo
+  const { user } = useUser();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/users/${userId}/friends`)
+    if (!user) return;
+    fetch(`http://localhost:3000/users/${user.id}/friends`)
       .then((res) => res.json())
       .then(setFeed)
       .catch((err) => console.error("Error fetching mutual feed:", err));
-  }, [userId]);
+  }, [user]);
 
   return (
     <div className="space-y-6 p-6">

@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export const SavedPage = () => {
   const [restaurants, setRestaurants] = useState([]);
-  const userId = 1; // Temporal, reemplazar con contexto/auth
+  const { user } = useUser();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/users/${userId}/favorite-restaurants`)
+    if (!user) return;
+    fetch(`http://localhost:3000/users/${user.id}/favorite-restaurants`)
       .then((res) => res.json())
       .then(setRestaurants)
       .catch((err) => console.error("Error fetching saved restaurants:", err));
-  }, [userId]);
+  }, [user]);
 
   return (
     <div className="space-y-6 p-6">
