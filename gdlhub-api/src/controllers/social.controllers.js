@@ -33,10 +33,25 @@ export const addRestaurantComment = async (req, res) => {
   try {
     const { rows } = await pool.query(
       `INSERT INTO comments (user_id, restaurant_id, content)
-       VALUES ($1, $2, $3) RETURNING *`,
+   VALUES ($1, $2, $3)
+   RETURNING id, content, created_at`,
       [userId, rid, content.trim()]
     );
-    res.status(201).json(rows[0]);
+
+    const comment = rows[0];
+
+    // Obtener nombre y avatar del usuario
+    const userRes = await pool.query(
+      `SELECT name AS user_name, avatar FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    res.status(201).json({
+      ...comment,
+      user_name: userRes.rows[0].user_name,
+      avatar: userRes.rows[0].avatar,
+    });
+
   } catch (err) {
     console.error("Error adding comment:", err);
     res.status(500).json({ message: "Error al agregar comentario" });
