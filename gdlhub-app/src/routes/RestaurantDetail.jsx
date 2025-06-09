@@ -86,6 +86,20 @@ export default function RestaurantDetail() {
     setSubmitting(false);
   };
 
+  const handleDeleteComment = async (commentId) => {
+    if (!user || !token) return;
+
+    const res = await fetch(`${API_BASE}/comments/${commentId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (res.ok) {
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+    }
+  };
+
+
   const handleToggleSave = () => {
     if (!user || !token) {
       setShowLoginMessage(true);
@@ -167,9 +181,8 @@ export default function RestaurantDetail() {
       <div className="mt-4 space-y-2">
         <button
           onClick={handleToggleSave}
-          className={`px-4 py-2 rounded font-semibold transition ${
-            saved ? "bg-gray-600 hover:bg-gray-500" : "bg-red-600 hover:bg-red-500"
-          }`}
+          className={`px-4 py-2 rounded font-semibold transition ${saved ? "bg-gray-600 hover:bg-gray-500" : "bg-red-600 hover:bg-red-500"
+            }`}
         >
           {saved ? "Quitar de favoritos" : "Guardar restaurante"}
         </button>
@@ -241,21 +254,24 @@ export default function RestaurantDetail() {
             {comments.map((c) => (
               <div key={c.id} className="bg-neutral-700 p-4 rounded-xl shadow-md text-white space-y-1">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={`${API_BASE}/img/user/${c.avatar}`}
-                    alt={c.user_name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
+                  <img src={`${API_BASE}/img/user/${c.avatar}`} alt={c.user_name} className="w-10 h-10 rounded-full object-cover" />
                   <div>
                     <p className="font-medium text-white">{c.user_name}</p>
-                    <p className="text-xs text-gray-400">
-                      {new Date(c.created_at).toLocaleString()}
-                    </p>
+                    <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>
                   </div>
+                  {user?.name === c.user_name && (
+                    <button
+                      onClick={() => handleDeleteComment(c.id)}
+                      className="text-sm text-red-400 hover:text-red-300 ml-auto"
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </div>
                 <p className="text-sm text-gray-300 mt-2">{c.content}</p>
               </div>
             ))}
+
           </div>
         </div>
       )}

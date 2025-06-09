@@ -405,3 +405,23 @@ export const isSavedRestaurant = async (req, res) => {
   }
 };
 
+export const deleteComment = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM comments WHERE id = $1 AND user_id = $2 RETURNING *`,
+      [id, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(403).json({ message: "No autorizado o comentario no existe" });
+    }
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.error("Error al eliminar comentario:", err);
+    res.status(500).json({ message: "Error al eliminar comentario" });
+  }
+};
