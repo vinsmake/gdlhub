@@ -1,24 +1,45 @@
-import { useLoaderData } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import { toPng } from "html-to-image";
-import { useRef } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useUser } from "../context/UserContext";
+import { API_BASE } from "@/config";
 
 export default function RestaurantDetail() {
-  const restaurant = useLoaderData();
+  const { rid } = useParams();
   const publicUrl = import.meta.env.VITE_PUBLIC_URL;
-  const restaurantUrl = `${publicUrl}/restaurants/${restaurant.id}`;
+  const restaurantUrl = `${publicUrl}/restaurants/${rid}`;
   const qrRef = useRef(null);
 
+  const [restaurant, setRestaurant] = useState(null);
   const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+
+  const { user, token } = useUser();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/restaurants/${restaurant.id}/comments`)
+    fetch(`${API_BASE}/restaurants/${rid}`)
+      .then(res => res.json())
+      .then(setRestaurant);
+  }, [rid]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/restaurants/${rid}/comments`)
       .then(res => res.json())
       .then(setComments);
-  }, [restaurant.id]);
+  }, [rid]);
 
+  useEffect(() => {
+    if (!user || !token) return;
+    fetch(`${API_BASE}/restaurants/${rid}/save`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setSaved(data.saved));
+  }, [rid, user, token]);
 
   const handleDownload = async () => {
     if (!qrRef.current) return;
@@ -29,7 +50,7 @@ export default function RestaurantDetail() {
         skipFonts: true,
       });
       const link = document.createElement("a");
-      link.download = `qr-${restaurant.id}.png`;
+      link.download = `qr-${rid}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -37,29 +58,11 @@ export default function RestaurantDetail() {
     }
   };
 
-  // Agrupar menú por categoría
-  const groupedMenu = {};
-  restaurant.menu.forEach((item) => {
-    if (Array.isArray(item.categories)) {
-      item.categories.forEach((cat) => {
-        if (!groupedMenu[cat]) groupedMenu[cat] = [];
-        groupedMenu[cat].push(item);
-      });
-    } else {
-      const cat = item.category || "Otros";
-      if (!groupedMenu[cat]) groupedMenu[cat] = [];
-      groupedMenu[cat].push(item);
-    }
-  });
-
-  const [newComment, setNewComment] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
 
     setSubmitting(true);
-    const res = await fetch(`http://localhost:3000/restaurants/${restaurant.id}/comments`, {
+    const res = await fetch(`${API_BASE}/restaurants/${rid}/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: newComment })
@@ -74,41 +77,52 @@ export default function RestaurantDetail() {
     setSubmitting(false);
   };
 
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    fetch(`http://localhost:3000/restaurants/${restaurant.id}/save`)
-      .then(res => res.json())
-      .then(data => setSaved(data.saved));
-  }, [restaurant.id]);
-
   const handleToggleSave = () => {
-    fetch(`http://localhost:3000/restaurants/${restaurant.id}/save`, {
-      method: saved ? "DELETE" : "POST"
+    if (!user || !token) {
+      setShowLoginMessage(true);
+      return;
+    }
+
+    fetch(`${API_BASE}/restaurants/${rid}/save`, {
+      method: saved ? "DELETE" : "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }).then(() => setSaved(!saved));
   };
 
+  if (!restaurant) return null;
 
+  const groupedMenu = {};
+  restaurant.menu.forEach((item) => {
+    if (Array.isArray(item.categories)) {
+      item.categories.forEach((cat) => {
+        if (!groupedMenu[cat]) groupedMenu[cat] = [];
+        groupedMenu[cat].push(item);
+      });
+    } else {
+      const cat = item.category || "Otros";
+      if (!groupedMenu[cat]) groupedMenu[cat] = [];
+      groupedMenu[cat].push(item);
+    }
+  });
 
   return (
     <div className="bg-neutral-800 p-8 rounded-2xl shadow-xl text-white space-y-6 w-full max-w-7xl mx-auto px-4">
       <h2 className="text-4xl font-bold">{restaurant.name}</h2>
+
       {restaurant.image && (
         <div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
           <img
-            src={`http://localhost:3000/img/restaurant/${restaurant.image}`}
+            src={`${API_BASE}/img/restaurant/${restaurant.image}`}
             alt={restaurant.name}
             className="w-full h-full object-cover"
           />
         </div>
-
-
       )}
 
-
       <p className="text-lg text-gray-300">
-        <span className="font-semibold text-gray-200">Ubicación:</span>{" "}
-        {restaurant.address}
+        <span className="font-semibold text-gray-200">Ubicación:</span> {restaurant.address}
       </p>
 
       {restaurant.description && (
@@ -144,25 +158,24 @@ export default function RestaurantDetail() {
         </div>
       )}
 
-      {/* Botón de guardar/quitar restaurante */}
-      <div className="mt-4">
+      <div className="mt-4 space-y-2">
         <button
           onClick={handleToggleSave}
-          className={`px-4 py-2 rounded font-semibold transition ${saved ? "bg-gray-600 hover:bg-gray-500" : "bg-red-600 hover:bg-red-500"
-            }`}
+          className={`px-4 py-2 rounded font-semibold transition ${
+            saved ? "bg-gray-600 hover:bg-gray-500" : "bg-red-600 hover:bg-red-500"
+          }`}
         >
           {saved ? "Quitar de favoritos" : "Guardar restaurante"}
         </button>
+        {showLoginMessage && (
+          <p className="text-sm text-red-400">Debes iniciar sesión para guardar restaurantes.</p>
+        )}
       </div>
 
-
-      {/* MENÚ agrupado por categoría */}
       <div className="space-y-10 mt-6">
         {Object.entries(groupedMenu).map(([category, items]) => (
           <div key={category}>
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              {category}
-            </h3>
+            <h3 className="text-2xl font-semibold text-white mb-4">{category}</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {items.map((item) => (
                 <div key={item.id} className="space-y-1 bg-neutral-700 p-4 rounded-xl">
@@ -194,7 +207,6 @@ export default function RestaurantDetail() {
         ))}
       </div>
 
-      {/* Formulario para agregar comentario */}
       <div className="mt-10 space-y-4">
         <h3 className="text-2xl font-semibold text-white">Deja un comentario</h3>
         <textarea
@@ -213,7 +225,6 @@ export default function RestaurantDetail() {
         </button>
       </div>
 
-      {/* comentarios */}
       {comments.length > 0 && (
         <div className="mt-10">
           <h3 className="text-2xl font-semibold text-white mb-4">Comentarios</h3>
@@ -222,13 +233,15 @@ export default function RestaurantDetail() {
               <div key={c.id} className="bg-neutral-700 p-4 rounded-xl shadow-md text-white space-y-1">
                 <div className="flex items-center gap-3">
                   <img
-                    src={`http://localhost:3000/img/user/${c.avatar}`}
+                    src={`${API_BASE}/img/user/${c.avatar}`}
                     alt={c.user_name}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
                     <p className="font-medium text-white">{c.user_name}</p>
-                    <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(c.created_at).toLocaleString()}
+                    </p>
                   </div>
                 </div>
                 <p className="text-sm text-gray-300 mt-2">{c.content}</p>
@@ -238,10 +251,8 @@ export default function RestaurantDetail() {
         </div>
       )}
 
-      {/* QR con logo y fondo rojo */}
       <div className="mt-10 text-center space-y-4">
         <h3 className="text-lg font-semibold text-gray-300">Escanea el QR para compartir</h3>
-
         <div
           ref={qrRef}
           onClick={handleDownload}
@@ -263,7 +274,6 @@ export default function RestaurantDetail() {
             <p className="text-sm font-light tracking-wide">GDLHUB</p>
           </div>
         </div>
-
         <p className="text-sm text-gray-400">Mantén pulsado para compartir o toca para descargar</p>
       </div>
     </div>

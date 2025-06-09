@@ -1,16 +1,17 @@
-import { useLoaderData, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-
-
-
+import { Link } from "react-router-dom";
+import { API_BASE } from "@/config";
 
 export default function UsersPage() {
-  const users = useLoaderData();
-
+  const [users, setUsers] = useState([]);
   const [feed, setFeed] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/feed")
+    fetch(`${API_BASE}/users`)
+      .then(res => res.json())
+      .then(setUsers);
+
+    fetch(`${API_BASE}/feed`)
       .then(res => res.json())
       .then(setFeed);
   }, []);
@@ -115,10 +116,8 @@ export default function UsersPage() {
               </div>
             ))}
           </div>
-
         </>
       )}
-
     </div>
   );
 }

@@ -1,32 +1,52 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useUser } from "../context/UserContext";
+import { API_BASE } from "@/config";
 
 export default function RestaurantEdit() {
-  const data = useLoaderData();
+  const { rid } = useParams();
   const navigate = useNavigate();
+  const { token } = useUser();
 
-const [categories] = useState(data.categories || []);
-const [tags] = useState(data.tags || []);
-
-  const [form, setForm] = useState({
-    name: data.name,
-    description: data.description,
-    address: data.address,
-    maps: data.maps || "",
-  });
-
-  const [specialties, setSpecialties] = useState(data.specialties || [""]);
-
-  const [menuItems, setMenuItems] = useState(
-    data.menu.map((item) => ({
-      ...item,
-      price: item.price || "",
-      category_ids: item.category_ids || [],
-      tag_ids: item.tag_ids || [],
-    }))
-  );
-
+  const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/restaurants/${rid}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("No se pudo cargar el restaurante");
+        return res.json();
+      })
+      .then(setData)
+      .catch((err) => setError(err.message));
+  }, [rid]);
+
+  const [form, setForm] = useState({ name: "", description: "", address: "", maps: "" });
+  const [specialties, setSpecialties] = useState([""]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    if (!data) return;
+    setForm({
+      name: data.name,
+      description: data.description,
+      address: data.address,
+      maps: data.maps || "",
+    });
+    setSpecialties(data.specialties || [""]);
+    setMenuItems(
+      data.menu.map((item) => ({
+        ...item,
+        price: item.price || "",
+        category_ids: item.category_ids || [],
+        tag_ids: item.tag_ids || [],
+      }))
+    );
+    setCategories(data.categories || []);
+    setTags(data.tags || []);
+  }, [data]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -37,9 +57,12 @@ const [tags] = useState(data.tags || []);
     setError(null);
 
     try {
-      const res = await fetch(`http://localhost:3000/restaurants/${data.id}`, {
+      const res = await fetch(`${API_BASE}/restaurants/${rid}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           ...form,
           specialties: specialties.filter((s) => s.trim() !== ""),
@@ -49,11 +72,13 @@ const [tags] = useState(data.tags || []);
 
       if (!res.ok) throw new Error("Error al actualizar restaurante");
 
-      navigate(`/restaurants/${data.id}`);
+      navigate(`/restaurants/${rid}`);
     } catch (err) {
       setError(err.message);
     }
   };
+
+  if (!data) return <div className="text-white text-center mt-10">Cargando...</div>;
 
   return (
     <div className="max-w-2xl mx-auto bg-neutral-800 p-6 rounded-2xl text-white space-y-6 shadow-lg mt-10">
@@ -64,7 +89,6 @@ const [tags] = useState(data.tags || []);
         <input name="address" placeholder="Dirección" value={form.address} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" required />
         <input name="maps" placeholder="Embed URL de Google Maps" value={form.maps} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" />
 
-        {/* Especialidades */}
         <div>
           <h2 className="text-xl font-semibold mt-4 mb-2">Especialidades</h2>
           {specialties.map((spec, index) => (
@@ -86,7 +110,6 @@ const [tags] = useState(data.tags || []);
           )}
         </div>
 
-        {/* Menú */}
         <div>
           <h2 className="text-xl font-semibold mt-4 mb-2">Menú</h2>
           {menuItems.map((item, index) => (
@@ -124,8 +147,6 @@ const [tags] = useState(data.tags || []);
                 }}
                 className="w-full p-2 rounded"
               />
-
-              {/* Categorías */}
               <label className="text-sm font-semibold block text-white">Categorías:</label>
               <div className="flex flex-wrap gap-2">
                 {categories.map((cat) => (
@@ -147,7 +168,6 @@ const [tags] = useState(data.tags || []);
                 ))}
               </div>
 
-              {/* Etiquetas */}
               <label className="text-sm font-semibold block text-white mt-2">Etiquetas:</label>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (

@@ -1,17 +1,26 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import { API_BASE } from "@/config";
 
 export default function UserDetail() {
-  const viewedUser = useLoaderData(); // usuario que se está viendo
-  const { user, token } = useUser(); // usuario loggeado
-  const [following, setFollowing] = useState(false);
+  const { uid } = useParams(); // ← para obtener el ID de la URL
+  const { user, token } = useUser();
   const navigate = useNavigate();
+
+  const [viewedUser, setViewedUser] = useState(null);
+  const [following, setFollowing] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/users/${uid}`)
+      .then(res => res.json())
+      .then(setViewedUser);
+  }, [uid]);
 
   useEffect(() => {
     if (!user || !token) return;
 
-    fetch(`http://localhost:3000/users/${viewedUser.id}/follow`, {
+    fetch(`${API_BASE}/users/${uid}/follow`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -24,7 +33,7 @@ export default function UserDetail() {
         if (data?.following) setFollowing(true);
       })
       .catch(() => {});
-  }, [viewedUser.id, user, token]);
+  }, [uid, user, token]);
 
   const handleClick = () => {
     if (!user || !token) {
@@ -32,13 +41,15 @@ export default function UserDetail() {
       return;
     }
 
-    fetch(`http://localhost:3000/users/${viewedUser.id}/follow`, {
+    fetch(`${API_BASE}/users/${uid}/follow`, {
       method: following ? "DELETE" : "POST",
       headers: {
         Authorization: `Bearer ${token}`
       }
     }).then(() => setFollowing(!following));
   };
+
+  if (!viewedUser) return null;
 
   return (
     <div className="text-white space-y-4">
