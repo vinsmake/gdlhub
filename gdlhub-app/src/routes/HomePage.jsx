@@ -1,17 +1,37 @@
-import { useLoaderData, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import { fetchAuth } from "../utils/fetchAuth";
 
 export const HomePage = () => {
-  const { restaurants, users } = useLoaderData();
+  const [users, setUsers] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const [feed, setFeed] = useState([]);
   const { user } = useUser();
 
   useEffect(() => {
     if (!user) return;
-    fetch(`http://localhost:3000/users/${user.id}/feed`)
-      .then(res => res.json())
-      .then(setFeed);
+
+    Promise.all([
+      fetchAuth(`http://localhost:3000/users/${user.id}/following`),
+      fetchAuth(`http://localhost:3000/users/${user.id}/favorite-restaurants`),
+      fetchAuth(`http://localhost:3000/users/${user.id}/feed`)
+    ])
+      .then(async ([usersRes, restaurantsRes, feedRes]) => {
+        if (!usersRes.ok || !restaurantsRes.ok || !feedRes.ok) {
+          throw new Error("Fallo al obtener información");
+        }
+        const users = await usersRes.json();
+        const restaurants = await restaurantsRes.json();
+        const feed = await feedRes.json();
+
+        setUsers(users);
+        setRestaurants(restaurants);
+        setFeed(feed);
+      })
+      .catch(err => {
+        console.error("Error cargando datos del HomePage:", err);
+      });
   }, [user]);
 
   return (
@@ -26,7 +46,7 @@ export const HomePage = () => {
         Inicio
       </h1>
 
-      {/* 1. Usuarios que sigues */}
+      {/* Usuarios que sigues */}
       <h2 className="text-2xl font-semibold text-white">Usuarios que sigues</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {users.map((u) => (
@@ -50,7 +70,7 @@ export const HomePage = () => {
         ))}
       </div>
 
-      {/* 2. Restaurantes que sigues */}
+      {/* Restaurantes que sigues */}
       <h2 className="text-2xl font-semibold text-white mt-10">Restaurantes que sigues</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {restaurants.map((r) => (
@@ -105,7 +125,7 @@ export const HomePage = () => {
         ))}
       </div>
 
-      {/* 3. Actividad reciente */}
+      {/* Actividad reciente */}
       {feed.length > 0 && (
         <>
           <h2 className="text-2xl font-semibold text-white mt-10">Actividad reciente</h2>
@@ -203,4 +223,4 @@ export const HomePage = () => {
       )}
     </div>
   );
-}
+};

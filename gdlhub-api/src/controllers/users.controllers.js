@@ -1,6 +1,6 @@
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
-
+import { generateToken } from "../utils/generateToken.js";
 
 
 export const getUsers = async (req, res) => {
@@ -118,16 +118,26 @@ export const loginUser = async (req, res) => {
     }
 
     const user = rows[0];
-
     const valid = await bcrypt.compare(password, user.password_hash);
+
     if (!valid) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // Simulación de login — más adelante usaremos JWT o sesiones
-    res.json({ id: user.id, name: user.name, email: user.email, avatar: user.avatar });
+    const token = generateToken(user); // ← genera JWT
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+      },
+    });
   } catch (err) {
     console.error("Error al hacer login:", err);
     res.status(500).json({ message: "Error interno" });
   }
 };
+

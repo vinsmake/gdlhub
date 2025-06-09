@@ -5,8 +5,8 @@ import { useUser } from "../context/UserContext";
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
+  const { login } = useUser();
   const navigate = useNavigate();
-  const { login } = useUser(); // ← usamos el contexto aquí
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,15 +28,14 @@ export default function LoginPage() {
       return;
     }
 
-    const user = await res.json();
-    login(user); // ← Guardamos en contexto y localStorage automáticamente
+    const { user, token } = await res.json();
+    login(user, token); // ← ✅ correctamente separado
     navigate("/");
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 space-y-6 text-white">
       <h1 className="text-2xl font-bold text-center">Iniciar Sesión</h1>
-
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       <input
