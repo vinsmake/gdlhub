@@ -223,13 +223,30 @@ export const deleteRestaurant = async (req, res) => {
 
 export const updateRestaurant = async (req, res) => {
   const { rid } = req.params;
+  const userId = req.user?.id;
   const { name, description, address, maps, specialties = [], menu = [] } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ message: "No autenticado" });
+  }
 
   const client = await pool.connect();
   try {
+    // Verificar propiedad del restaurante
+    const { rows } = await client.query(
+      "SELECT user_id FROM restaurants WHERE id = $1",
+      [rid]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Restaurante no encontrado" });
+    }
+    if (rows[0].user_id !== userId) {
+      return res.status(403).json({ message: "No tienes permiso para editar este restaurante" });
+    }
+
     await client.query("BEGIN");
 
-    // 1. Actualizar datos básicos del restaurante
+    // 1. Actualizar datos básicos
     await client.query(
       `UPDATE restaurants
        SET name = $1, description = $2, address = $3, maps = $4
@@ -248,7 +265,7 @@ export const updateRestaurant = async (req, res) => {
       }
     }
 
-    // 3. Reemplazar relaciones y menú
+    // 3. Reemplazar relaciones de menú
     const { rows: existingItems } = await client.query(
       "SELECT id FROM menu_items WHERE restaurant_id = $1",
       [rid]
@@ -260,10 +277,9 @@ export const updateRestaurant = async (req, res) => {
       await client.query("DELETE FROM menu_item_tags WHERE menu_item_id = ANY($1)", [itemIds]);
     }
 
-    // Eliminar los platillos (después de eliminar sus relaciones)
     await client.query("DELETE FROM menu_items WHERE restaurant_id = $1", [rid]);
 
-    // 4. Insertar nuevos platillos y sus relaciones
+    // 4. Insertar nuevo menú
     for (const item of menu) {
       if (item.name.trim()) {
         const { rows: itemRows } = await client.query(
@@ -310,6 +326,7 @@ export const updateRestaurant = async (req, res) => {
     client.release();
   }
 };
+
 
 export const getRestaurantsBySpecialties = async (req, res) => {
   const { tags } = req.query; // Ejemplo: "birria,sushi"
