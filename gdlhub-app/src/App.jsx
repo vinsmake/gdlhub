@@ -8,7 +8,6 @@ import { usersLoader } from "./loaders/usersLoader";
 import { userDetailLoader } from "./loaders/userDetailLoader";
 import { restaurantsLoader } from "./loaders/restaurantsLoaders";
 import { restaurantDetailLoader } from "./loaders/restaurantDetailLoaders";
-import { homeLoader } from "./loaders/homeLoader";
 import RestaurantPost from "./routes/RestaurantPost";
 import RestaurantEdit from "./routes/RestaurantEdit";
 import { restaurantEditLoader } from "./loaders/restaurantEditLoader";
@@ -27,7 +26,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     children: [
-      { path: "/", element: <HomePage />, loader: homeLoader },
+      { path: "/", element: <HomePage /> },
       { path: "users/create", element: <CreateUserPage /> },
       { path: "users", element: <UsersPage />, loader: usersLoader },
       { path: "users/:uid", element: <UserDetail />, loader: userDetailLoader },
