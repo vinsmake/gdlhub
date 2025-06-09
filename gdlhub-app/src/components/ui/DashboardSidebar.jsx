@@ -121,23 +121,42 @@ export const DashboardSidebar = () => {
             <Settings size={24} /> Configuración
           </a>
 
-          {/* Botón Login / Logout */}
-          <button
-            onClick={() => {
-              if (user) {
-                logout();
-                navigate("/login");
-              } else {
-                navigate("/login");
-              }
-            }}
-            className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition w-full text-left"
-          >
-            {user ? <LogOut size={24} /> : <LogIn size={24} />}
-            {user ? "Cerrar sesión" : "Iniciar sesión"}
-          </button>
+          
+
         </nav>
+
       </div>
+      {/* Usuario logueado */}
+          {user ? (
+            <div className="flex items-center gap-3 p-4 border-t border-neutral-700 mt-4">
+              <img
+                src={`http://localhost:3000/img/user/${user.avatar}`}
+                alt={user.name}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <p className="text-white font-semibold">{user.name}</p>
+                <button
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
+                  className="text-sm text-red-400 hover:text-red-300 transition"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 border-t border-neutral-700 mt-4">
+              <button
+                onClick={() => navigate("/login")}
+                className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition w-full text-left"
+              >
+                <LogIn size={24} /> Iniciar sesión
+              </button>
+            </div>
+          )}
     </aside>
   );
 };

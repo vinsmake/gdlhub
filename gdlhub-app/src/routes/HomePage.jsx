@@ -54,9 +54,7 @@ export const HomePage = () => {
   return (
     <div className="space-y-6">
       {user ? (
-        <div className="text-right text-gray-400 text-sm">
-          Bienvenido, <span className="font-semibold text-white">{user.name}</span>
-        </div>
+        ""
       ) : (
         <div className="text-center text-gray-300 space-y-4">
           <h1 className="text-3xl font-bold text-white">Bienvenido a GDLHUB</h1>
