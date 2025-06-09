@@ -108,15 +108,21 @@ ORDER BY mi.name
 
 export const createRestaurant = async (req, res) => {
   const client = await pool.connect();
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ message: "No autenticado" });
+  }
+
   try {
     const { name, description, address, maps, specialties = [], menu = [] } = req.body;
 
     await client.query("BEGIN");
 
-    // 1. Insertar restaurante
+    // 1. Insertar restaurante con user_id
     const { rows } = await client.query(
-      'INSERT INTO restaurants (name, description, address, maps) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, description, address, maps]
+      'INSERT INTO restaurants (name, description, address, maps, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [name, description, address, maps, userId]
     );
     const restaurant = rows[0];
 
@@ -135,7 +141,7 @@ export const createRestaurant = async (req, res) => {
       if (item.name.trim()) {
         const { rows: itemRows } = await client.query(
           `INSERT INTO menu_items (restaurant_id, name, description, price)
-       VALUES ($1, $2, $3, $4) RETURNING id`,
+           VALUES ($1, $2, $3, $4) RETURNING id`,
           [
             restaurant.id,
             item.name.trim(),
@@ -150,7 +156,7 @@ export const createRestaurant = async (req, res) => {
           for (const categoryId of item.category_ids) {
             await client.query(
               `INSERT INTO menu_item_categories (menu_item_id, category_id)
-           VALUES ($1, $2)`,
+               VALUES ($1, $2)`,
               [menuItemId, categoryId]
             );
           }
@@ -161,7 +167,7 @@ export const createRestaurant = async (req, res) => {
           for (const tagId of item.tag_ids) {
             await client.query(
               `INSERT INTO menu_item_tags (menu_item_id, tag_id)
-           VALUES ($1, $2)`,
+               VALUES ($1, $2)`,
               [menuItemId, tagId]
             );
           }
@@ -169,27 +175,51 @@ export const createRestaurant = async (req, res) => {
       }
     }
 
-
     await client.query("COMMIT");
     res.status(201).json(restaurant);
-  } catch (error) {
+  } catch (err) {
     await client.query("ROLLBACK");
-    console.error("Error creating restaurant:", error);
-    res.status(500).json({ message: "Error creating restaurant" });
+    console.error("Error creating restaurant:", err);
+    res.status(500).json({ message: "Error al crear restaurante" });
   } finally {
     client.release();
   }
 };
 
 
+
+
 export const deleteRestaurant = async (req, res) => {
   const { rid } = req.params;
-  const { rowCount } = await pool.query('DELETE FROM restaurants WHERE id = $1 RETURNING *', [rid]);
-  if (rowCount === 0) {
-    return res.status(404).json({ message: "Restaurant not found" });
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ message: "No autenticado" });
   }
+
+  // Verificar si el restaurante pertenece al usuario
+  const { rowCount: owned } = await pool.query(
+    `SELECT 1 FROM restaurants WHERE id = $1 AND user_id = $2`,
+    [rid, userId]
+  );
+
+  if (owned === 0) {
+    return res.status(403).json({ message: "No autorizado para eliminar este restaurante" });
+  }
+
+  // Eliminar
+  const { rowCount } = await pool.query(
+    `DELETE FROM restaurants WHERE id = $1`,
+    [rid]
+  );
+
+  if (rowCount === 0) {
+    return res.status(404).json({ message: "Restaurante no encontrado" });
+  }
+
   res.sendStatus(204);
 };
+
 
 export const updateRestaurant = async (req, res) => {
   const { rid } = req.params;

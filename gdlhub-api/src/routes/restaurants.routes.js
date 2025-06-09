@@ -8,6 +8,7 @@ import {
   getRestaurantsBySpecialties,
   searchRestaurants,
 } from "../controllers/restaurants.controllers.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
@@ -17,9 +18,10 @@ router.get("/restaurants/by-specialty", getRestaurantsBySpecialties);
 
 router.get("/restaurants", getRestaurants);
 router.get("/restaurants/:rid", getRestaurantById);
-router.post("/restaurants", createRestaurant);
-router.put("/restaurants/:rid", updateRestaurant);
-router.delete("/restaurants/:rid", deleteRestaurant);
+router.post("/restaurants", verifyToken, createRestaurant);
+router.put("/restaurants/:rid", verifyToken, updateRestaurant);
+router.delete("/restaurants/:rid", verifyToken, deleteRestaurant);
+
 
 
 
