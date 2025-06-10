@@ -1,29 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; // ← importar
 import { API_BASE } from "@/config";
 
 
-// Categorías y etiquetas predefinidas
-const CATEGORIES = [
-  { id: 1, name: "Desayuno" },
-  { id: 2, name: "Comida" },
-  { id: 3, name: "Cena" },
-  { id: 4, name: "Repostería" },
-  { id: 5, name: "Bebida" },
-  { id: 6, name: "Bebida con alcohol" },
-  { id: 7, name: "Entrada" },
-  { id: 8, name: "Temporada" },
-];
-
-const TAGS = [
-  { id: 1, name: "Opción vegana" },
-  { id: 2, name: "Opción vegetariana" },
-  { id: 3, name: "Opción sin gluten" },
-  { id: 4, name: "Opción diabética" },
-];
-
 export default function RestaurantPost() {
+
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/menu/meta`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data.categories || []);
+        setTags(data.tags || []);
+      })
+      .catch(() => setError("Error al cargar categorías y etiquetas"));
+  }, []);
+
+
   const { token } = useUser(); // ← obtener token
   const [form, setForm] = useState({
     name: "",
@@ -142,7 +138,7 @@ export default function RestaurantPost() {
               <div>
                 <label className="text-sm font-semibold block text-white">Categorías:</label>
                 <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map((cat) => (
+                  {categories.map((cat) => (
                     <label key={cat.id} className="flex items-center gap-1 text-sm text-gray-300">
                       <input
                         type="checkbox"
@@ -166,7 +162,7 @@ export default function RestaurantPost() {
               <div>
                 <label className="text-sm font-semibold block text-white mt-2">Etiquetas:</label>
                 <div className="flex flex-wrap gap-2">
-                  {TAGS.map((tag) => (
+                  {tags.map((tag) => (
                     <label key={tag.id} className="flex items-center gap-1 text-sm text-gray-300">
                       <input
                         type="checkbox"

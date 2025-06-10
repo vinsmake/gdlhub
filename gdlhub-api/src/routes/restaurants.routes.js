@@ -7,6 +7,7 @@ import {
   deleteRestaurant,
   getRestaurantsBySpecialties,
   searchRestaurants,
+  getMenuMeta,
 } from "../controllers/restaurants.controllers.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
@@ -21,6 +22,7 @@ router.get("/restaurants/:rid", getRestaurantById);
 router.post("/restaurants", verifyToken, createRestaurant);
 router.put("/restaurants/:rid", verifyToken, updateRestaurant);
 router.delete("/restaurants/:rid", verifyToken, deleteRestaurant);
+router.get("/menu/meta", getMenuMeta);
 
 
 

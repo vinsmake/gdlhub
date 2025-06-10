@@ -384,6 +384,14 @@ export const searchRestaurants = async (req, res) => {
   }
 };
 
+export const getMenuMeta = async (req, res) => {
+  try {
+    const { rows: categories } = await pool.query("SELECT id, name FROM menu_categories ORDER BY name");
+    const { rows: tags } = await pool.query("SELECT id, name FROM menu_tags ORDER BY name");
 
-
-
+    res.json({ categories, tags });
+  } catch (error) {
+    console.error("Error al obtener metadatos del menú:", error.message);
+    res.status(500).json({ message: "Error al obtener metadatos" });
+  }
+};
