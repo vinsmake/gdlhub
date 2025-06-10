@@ -29,24 +29,31 @@ export default function RestaurantEdit() {
 
   useEffect(() => {
     if (!data) return;
+
     setForm({
       name: data.name,
       description: data.description,
       address: data.address,
       maps: data.maps || "",
     });
+
     setSpecialties(data.specialties || [""]);
+
     setMenuItems(
-      data.menu.map((item) => ({
-        ...item,
-        price: item.price || "",
-        category_ids: item.category_ids || [],
-        tag_ids: item.tag_ids || [],
-      }))
+      Array.isArray(data.menu)
+        ? data.menu.map((item) => ({
+          ...item,
+          price: item.price || "",
+          category_ids: item.category_ids || [],
+          tag_ids: item.tag_ids || [],
+        }))
+        : []
     );
+
     setCategories(data.categories || []);
     setTags(data.tags || []);
   }, [data]);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -190,7 +197,7 @@ export default function RestaurantEdit() {
               </div>
             </div>
           ))}
-          {menuItems.length < 10 && (
+          {menuItems.length < 100 ? (
             <button
               type="button"
               onClick={() =>
@@ -203,6 +210,8 @@ export default function RestaurantEdit() {
             >
               + Agregar platillo
             </button>
+          ) : (
+            <p className="text-sm text-yellow-400">Límite de 20 platillos alcanzado</p>
           )}
         </div>
 

@@ -183,17 +183,21 @@ export default function RestaurantPost() {
               </div>
             </div>
           ))}
-          {menuItems.length < 10 && (
+          {menuItems.length < 100 ? (
             <button
               type="button"
-              onClick={() => setMenuItems([
-                ...menuItems,
-                { name: "", price: "", description: "", category_ids: [], tag_ids: [] },
-              ])}
-              className="text-sm text-blue-400 mt-1"
+              onClick={() =>
+                setMenuItems([
+                  ...menuItems,
+                  { name: "", price: "", description: "", category_ids: [], tag_ids: [] },
+                ])
+              }
+              className="text-sm text-blue-400"
             >
               + Agregar platillo
             </button>
+          ) : (
+            <p className="text-sm text-yellow-400">Límite de 20 platillos alcanzado</p>
           )}
         </div>
 
