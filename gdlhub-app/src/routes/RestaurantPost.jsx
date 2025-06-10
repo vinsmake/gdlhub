@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext"; // ← importar
+
 
 // Categorías y etiquetas predefinidas
 const CATEGORIES = [
@@ -21,6 +23,7 @@ const TAGS = [
 ];
 
 export default function RestaurantPost() {
+  const { token } = useUser(); // ← obtener token
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -47,7 +50,10 @@ export default function RestaurantPost() {
     try {
       const res = await fetch("http://localhost:3000/restaurants", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ← agregar token aquí
+        },
         body: JSON.stringify({
           ...form,
           specialties: specialties.filter((s) => s.trim() !== ""),
