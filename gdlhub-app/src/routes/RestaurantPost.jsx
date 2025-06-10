@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; // ← importar
+import { API_BASE } from "@/config";
 
 
 // Categorías y etiquetas predefinidas
@@ -48,7 +49,7 @@ export default function RestaurantPost() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:3000/restaurants", {
+      const res = await fetch(`${API_BASE}/restaurants`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
