@@ -107,16 +107,6 @@ export const DashboardSidebar = () => {
           >
             <Eye size={24} /> Busqueda
           </NavLink>
-
-          <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-            <List size={24} /> Categorías
-          </a>
-          <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-            <Percent size={24} /> Ofertas
-          </a>
-          <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
-            <MapPin size={24} /> Mapa
-          </a>
           <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
             <Settings size={24} /> Configuración
           </a>
