@@ -7,6 +7,8 @@ services:
       context: ./gdlhub-app
       args:
         - MODE=${MODE}
+    env_file:
+      - .env
     environment:
       - MODE=${MODE}
     volumes:
