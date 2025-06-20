@@ -12,7 +12,7 @@ export const SearchPage = () => {
         return;
       }
 
-      fetch(`http://localhost:3000/restaurants/search?q=${encodeURIComponent(query)}`)
+      fetch(`${import.meta.env.VITE_API_BASE}/restaurants/search?q=${encodeURIComponent(query)}`)
         .then((res) => res.json())
         .then((data) => {
           setResults(data);
@@ -50,7 +50,7 @@ export const SearchPage = () => {
                 {r.image && (
                   <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
                     <img
-                      src={`http://localhost:3000/img/restaurant/${r.image}`}
+                      src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
                       alt={r.name}
                       className="w-full h-full object-cover"
                     />

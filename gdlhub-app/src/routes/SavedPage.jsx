@@ -8,7 +8,7 @@ export const SavedPage = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`http://localhost:3000/users/${user.id}/favorite-restaurants`)
+    fetch(`${import.meta.env.VITE_API_BASE}/users/${user.id}/favorite-restaurants`)
       .then((res) => res.json())
       .then(setRestaurants)
       .catch((err) => console.error("Error fetching saved restaurants:", err));
@@ -32,7 +32,7 @@ export const SavedPage = () => {
                 {r.image && (
                   <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
                     <img
-                      src={`http://localhost:3000/img/restaurant/${r.image}`}
+                      src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
                       alt={r.name}
                       className="w-full h-full object-cover"
                     />

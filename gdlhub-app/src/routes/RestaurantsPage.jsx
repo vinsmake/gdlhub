@@ -27,7 +27,7 @@ export default function RestaurantsPage() {
               {r.image && (
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
                   <img
-                    src={`http://localhost:3000/img/restaurant/${r.image}`}
+                    src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
                     alt={r.name}
                     className="w-full h-full object-cover"
                   />

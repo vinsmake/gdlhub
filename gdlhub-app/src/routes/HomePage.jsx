@@ -14,9 +14,9 @@ export const HomePage = () => {
   useEffect(() => {
     if (user) {
       Promise.all([
-        fetchAuth(`http://localhost:3000/users/${user.id}/following`),
-        fetchAuth(`http://localhost:3000/users/${user.id}/favorite-restaurants`),
-        fetchAuth(`http://localhost:3000/users/${user.id}/feed`)
+        fetchAuth(`${import.meta.env.VITE_API_BASE}/users/${user.id}/following`),
+        fetchAuth(`${import.meta.env.VITE_API_BASE}/users/${user.id}/favorite-restaurants`),
+        fetchAuth(`${import.meta.env.VITE_API_BASE}/users/${user.id}/feed`)
       ])
         .then(async ([usersRes, restaurantsRes, feedRes]) => {
           if (!usersRes.ok || !restaurantsRes.ok || !feedRes.ok) {
@@ -36,8 +36,8 @@ export const HomePage = () => {
         });
     } else {
       Promise.all([
-        fetch("http://localhost:3000/users"),
-        fetch("http://localhost:3000/restaurants")
+        fetch(`${import.meta.env.VITE_API_BASE}/users`),
+        fetch(`${import.meta.env.VITE_API_BASE}/restaurants`)
       ])
         .then(async ([usersRes, restaurantsRes]) => {
           const users = await usersRes.json();
@@ -94,7 +94,7 @@ export const HomePage = () => {
           >
             <div className="flex items-center gap-4">
               <img
-                src={`http://localhost:3000/img/user/${u.avatar}`}
+                src={`${import.meta.env.VITE_API_BASE}/img/user/${u.avatar}`}
                 alt={u.name}
                 className="w-16 h-16 rounded-full object-cover"
               />
@@ -122,7 +122,7 @@ export const HomePage = () => {
               {r.image && (
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
                   <img
-                    src={`http://localhost:3000/img/restaurant/${r.image}`}
+                    src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
                     alt={r.name}
                     className="w-full h-full object-cover"
                   />
@@ -176,7 +176,7 @@ export const HomePage = () => {
               >
                 <div className="flex items-start gap-4">
                   <img
-                    src={`http://localhost:3000/img/user/${item.avatar}`}
+                    src={`${import.meta.env.VITE_API_BASE}/img/user/${item.avatar}`}
                     alt={item.user_name}
                     className="w-14 h-14 rounded-full object-cover"
                   />
@@ -211,7 +211,7 @@ export const HomePage = () => {
                             className="w-24 h-36 rounded-md overflow-hidden flex-shrink-0 border border-neutral-600 bg-neutral-700 hover:opacity-90 transition"
                           >
                             <img
-                              src={`http://localhost:3000/img/restaurant/${item.restaurant_image}`}
+                              src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${item.restaurant_image}`}
                               alt={item.restaurant_name}
                               className="w-full h-full object-cover"
                             />

@@ -55,7 +55,7 @@ export default function UserDetail() {
       <h2 className="text-2xl font-bold">{viewedUser.name}</h2>
       <p>Email: {viewedUser.email}</p>
       <img
-        src={`http://localhost:3000/img/user/${viewedUser.avatar}`}
+        src={`${import.meta.env.VITE_API_BASE}/img/user/${viewedUser.avatar}`}
         alt={viewedUser.name}
         className="w-16 h-16 rounded-full object-cover"
       />

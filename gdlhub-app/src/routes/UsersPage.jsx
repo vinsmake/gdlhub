@@ -32,7 +32,7 @@ export default function UsersPage() {
               >
                 <div className="flex items-start gap-4">
                   <img
-                    src={`http://localhost:3000/img/user/${item.avatar}`}
+                    src={`${import.meta.env.VITE_API_BASE}/img/user/${item.avatar}`}
                     alt={item.user_name}
                     className="w-14 h-14 rounded-full object-cover"
                   />
@@ -73,7 +73,7 @@ export default function UsersPage() {
                             className="w-24 h-36 flex-shrink-0 bg-white rounded-md shadow-inner border border-gray-300 overflow-hidden hover:opacity-90 transition"
                           >
                             <img
-                              src={`http://localhost:3000/img/restaurant/${item.restaurant_image}`}
+                              src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${item.restaurant_image}`}
                               alt={item.restaurant_name}
                               className="w-full h-full object-cover"
                             />

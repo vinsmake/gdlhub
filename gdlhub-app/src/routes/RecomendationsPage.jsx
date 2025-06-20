@@ -8,7 +8,7 @@ export const RecomendationsPage = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`http://localhost:3000/users/${user.id}/recommendations`)
+    fetch(`${import.meta.env.VITE_API_BASE}/users/${user.id}/recommendations`)
       .then((res) => res.json())
       .then(setRecommendations)
       .catch((err) => console.error("Error fetching recommendations:", err));
@@ -29,7 +29,7 @@ export const RecomendationsPage = () => {
               className="bg-neutral-700 p-4 rounded-2xl shadow-lg hover:bg-neutral-600 transition-colors"
             >
               <img
-                src={`http://localhost:3000/img/restaurant/${r.image}`}
+                src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
                 alt={r.name}
                 className="w-full h-40 object-cover rounded-lg mb-4"
               />
