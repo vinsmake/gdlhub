@@ -33,16 +33,12 @@ services:
         - MODE=${MODE}
     environment:
       - MODE=${MODE}
-      - APIPORT=${APIPORT}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
     volumes:
       - ./gdlhub-api:/app
       - ./db:/app/db  
       - /app/node_modules
+    env_file:
+      - .env  
     ports:
       - "${APIPORT}:${APIPORT}"
     depends_on:

@@ -2,7 +2,6 @@ import express from "express";
 import userRoutes from "./routes/users.routes.js";
 import restaurantRoutes from "./routes/restaurants.routes.js";
 import socialRoutes from "./routes/social.routes.js";
-import { PORT } from "./config.js";
 import morgan from "morgan";
 import cors from "cors";
 import path from "path";
@@ -24,6 +23,6 @@ app.use("/img/user", express.static(path.resolve(process.cwd(), "db/img/user")))
 app.use("/img/restaurant", express.static(path.resolve(process.cwd(), "db/img/restaurants/profile")));
 
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+app.listen(process.env.APIPORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${process.env.APIPORT}`);
 });
