@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE } from "@/config";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [feed, setFeed] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/users`)
+    fetch(`${import.meta.env.VITE_API_BASE}/users`)
       .then(res => res.json())
       .then(setUsers);
 
-    fetch(`${API_BASE}/feed`)
+    fetch(`${import.meta.env.VITE_API_BASE}/feed`)
       .then(res => res.json())
       .then(setFeed);
   }, []);

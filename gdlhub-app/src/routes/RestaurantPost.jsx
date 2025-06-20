@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; // ← importar
-import { API_BASE } from "@/config";
 
 
 export default function RestaurantPost() {
@@ -10,7 +9,7 @@ export default function RestaurantPost() {
   const [tags, setTags] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/menu/meta`)
+    fetch(`${import.meta.env.VITE_API_BASE}/menu/meta`)
       .then((res) => res.json())
       .then((data) => {
         setCategories(data.categories || []);
@@ -45,7 +44,7 @@ export default function RestaurantPost() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE}/restaurants`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE}/restaurants`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

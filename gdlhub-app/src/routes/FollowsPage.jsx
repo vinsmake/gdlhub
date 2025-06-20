@@ -10,7 +10,7 @@ export const FollowsPage = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`http://localhost:3000/users/${user.id}/feed`)
+    fetch(`${import.meta.env.VITE_API_BASE}/users/${user.id}/feed`)
       .then(res => res.json())
       .then(setFeed);
   }, [user]);

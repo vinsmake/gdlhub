@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
-import { API_BASE } from "@/config";
 
 export default function RestaurantEdit() {
   const { rid } = useParams();
@@ -12,7 +11,7 @@ export default function RestaurantEdit() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/restaurants/${rid}`)
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
       .then((res) => {
         if (!res.ok) throw new Error("No se pudo cargar el restaurante");
         return res.json();
@@ -64,7 +63,7 @@ export default function RestaurantEdit() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE}/restaurants/${rid}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE } from "@/config";
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/restaurants`)
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants`)
       .then((res) => res.json())
       .then(setRestaurants)
       .catch((err) => console.error("Error cargando restaurantes:", err));

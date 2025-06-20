@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { API_BASE } from "@/config";
 
 export default function UserDetail() {
   const { uid } = useParams(); // ← para obtener el ID de la URL
@@ -12,7 +11,7 @@ export default function UserDetail() {
   const [following, setFollowing] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_BASE}/users/${uid}`)
+    fetch(`${import.meta.env.VITE_API_BASE}/users/${uid}`)
       .then(res => res.json())
       .then(setViewedUser);
   }, [uid]);
@@ -20,7 +19,7 @@ export default function UserDetail() {
   useEffect(() => {
     if (!user || !token) return;
 
-    fetch(`${API_BASE}/users/${uid}/follow`, {
+    fetch(`${import.meta.env.VITE_API_BASE}/users/${uid}/follow`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -41,7 +40,7 @@ export default function UserDetail() {
       return;
     }
 
-    fetch(`${API_BASE}/users/${uid}/follow`, {
+    fetch(`${import.meta.env.VITE_API_BASE}/users/${uid}/follow`, {
       method: following ? "DELETE" : "POST",
       headers: {
         Authorization: `Bearer ${token}`

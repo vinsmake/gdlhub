@@ -3,7 +3,6 @@ import { QRCodeCanvas } from "qrcode.react";
 import { toPng } from "html-to-image";
 import { useRef, useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import { API_BASE } from "@/config";
 
 export default function RestaurantDetail() {
   const { rid } = useParams();
@@ -22,20 +21,20 @@ export default function RestaurantDetail() {
   const { user, token } = useUser();
 
   useEffect(() => {
-    fetch(`${API_BASE}/restaurants/${rid}`)
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
       .then(res => res.json())
       .then(setRestaurant);
   }, [rid]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/restaurants/${rid}/comments`)
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}/comments`)
       .then(res => res.json())
       .then(setComments);
   }, [rid]);
 
   useEffect(() => {
     if (!user || !token) return;
-    fetch(`${API_BASE}/restaurants/${rid}/save`, {
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}/save`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -68,7 +67,7 @@ export default function RestaurantDetail() {
     if (!newComment.trim()) return;
 
     setSubmitting(true);
-    const res = await fetch(`${API_BASE}/restaurants/${rid}/comments`, {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}/comments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +88,7 @@ export default function RestaurantDetail() {
   const handleDeleteComment = async (commentId) => {
     if (!user || !token) return;
 
-    const res = await fetch(`${API_BASE}/comments/${commentId}`, {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE}/comments/${commentId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -106,7 +105,7 @@ export default function RestaurantDetail() {
       return;
     }
 
-    fetch(`${API_BASE}/restaurants/${rid}/save`, {
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}/save`, {
       method: saved ? "DELETE" : "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -137,7 +136,7 @@ export default function RestaurantDetail() {
       {restaurant.image && (
         <div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
           <img
-            src={`${API_BASE}/img/restaurant/${restaurant.image}`}
+            src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${restaurant.image}`}
             alt={restaurant.name}
             className="w-full h-full object-cover"
           />
@@ -254,7 +253,7 @@ export default function RestaurantDetail() {
             {comments.map((c) => (
               <div key={c.id} className="bg-neutral-700 p-4 rounded-xl shadow-md text-white space-y-1">
                 <div className="flex items-center gap-3">
-                  <img src={`${API_BASE}/img/user/${c.avatar}`} alt={c.user_name} className="w-10 h-10 rounded-full object-cover" />
+                  <img src={`${import.meta.env.VITE_API_BASE}/img/user/${c.avatar}`} alt={c.user_name} className="w-10 h-10 rounded-full object-cover" />
                   <div>
                     <p className="font-medium text-white">{c.user_name}</p>
                     <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>
