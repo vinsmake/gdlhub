@@ -24,5 +24,5 @@ app.use("/img/restaurant", express.static(path.resolve(process.cwd(), "db/img/re
 
 
 app.listen(process.env.APIPORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${process.env.APIPORT}`);
+  console.log(`Server is running on http://localhost:${process.env.APIPORT}`);
 });

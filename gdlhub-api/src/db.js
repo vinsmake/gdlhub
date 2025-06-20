@@ -27,5 +27,5 @@ const connectWithRetry = async (retries = 5, delay = 2000) => {
   }
 };
 
-console.log('Intentando conectar a PostgreSQL con:', config);
+console.log(`Intentando conectar a ${process.env.DB_NAME} de PostgreSQL`);
 connectWithRetry();
