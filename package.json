@@ -20,6 +20,7 @@
     "dockercompose:rebuild": "docker-compose down --volumes --rmi all && docker compose up --build -d",
     "dockercompose:down": "docker-compose down --volumes --rmi all",
     "dockercompose:build": "docker compose up --build -d",
+    "server:front": "http-server gdlhub-app/dist",
     "help": "node -e \"console.log(\\\"\\n🛠 COMANDOS DISPONIBLES (npm run)\\n\\ncompose:up:build → Levanta todos los contenedores en modo detached (--build).\\ndb:backup → Backup de gdlhub_db guardado en ./backups/backup_gdlhub.sql\\ndb:restore → Restaura gdlhub_db desde ./backups/backup_gdlhub.sql\\ndb:backup:all → Backup completo de todas las bases guardado en ./backups/full_backup_all.sql\\ndb:restore:all → Restaura todas las bases desde ./backups/full_backup_all.sql\\ndb:restore:fresh → Para restaurar un entorno desde cero, carga init.sql\\\")\"",
     "git:reset": "git reset --hard HEAD"
   },
@@ -35,6 +36,7 @@
   },
   "homepage": "https://github.com/vinsmake/gdlhub#readme",
   "dependencies": {
-    "gh-pages": "^6.3.0"
+    "gh-pages": "^6.3.0",
+    "http-server": "^14.1.1"
   }
 }

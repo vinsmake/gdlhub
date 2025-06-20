@@ -15,7 +15,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, "./src"),
     },
   },
-  base: "https://gdlhub.app/",
+  base: "./",
   server: {
     host: true,
     watch: {
