@@ -45,6 +45,21 @@ export default function RestaurantDetail() {
       .then(data => setSaved(data.saved));
   }, [rid, user, token]);
 
+  useEffect(() => {
+    if (!isMobile) return;
+    let attempts = 0;
+    const maxAttempts = 6; // 6 intentos cada 5s = 30 segundos
+
+    const interval = setInterval(() => {
+      attempts += 1;
+      handleDownload();
+      if (attempts >= maxAttempts) clearInterval(interval);
+    }, 5000);
+
+    return () => clearInterval(interval); // limpieza por si se desmonta antes
+  }, [restaurant]); // solo cuando el restaurante se haya cargado
+
+
   const handleDownload = async () => {
     if (!qrRef.current) return;
     try {
