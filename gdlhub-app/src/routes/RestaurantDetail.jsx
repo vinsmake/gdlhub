@@ -18,6 +18,10 @@ export default function RestaurantDetail() {
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [showCommentLoginMessage, setShowCommentLoginMessage] = useState(false);
 
+  const [finalImage, setFinalImage] = useState(null);
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+
   const { user, token } = useUser();
 
   useEffect(() => {
@@ -49,14 +53,20 @@ export default function RestaurantDetail() {
         pixelRatio: 2,
         skipFonts: true,
       });
-      const link = document.createElement("a");
-      link.download = `qr-${rid}.png`;
-      link.href = dataUrl;
-      link.click();
+
+      if (isMobile) {
+        setFinalImage(dataUrl); // mostrará imagen que se puede mantener presionada
+      } else {
+        const link = document.createElement("a");
+        link.download = `qr-${rid}.png`;
+        link.href = dataUrl;
+        link.click();
+      }
     } catch (err) {
       console.error("Error al generar la imagen:", err);
     }
   };
+
 
   const handleSubmitComment = async () => {
     if (!user || !token) {
@@ -299,6 +309,17 @@ export default function RestaurantDetail() {
           </div>
         </div>
         <p className="text-sm text-gray-400">Toca el codigo QR para descargar</p>
+        {isMobile && finalImage && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-400 mb-2">Mantén presionado para guardar en tu galería</p>
+            <img
+              src={finalImage}
+              alt="QR para guardar"
+              className="w-[260px] h-auto mx-auto rounded-xl shadow-md"
+            />
+          </div>
+        )}
+
       </div>
     </div>
   );
