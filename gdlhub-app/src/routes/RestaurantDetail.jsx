@@ -25,9 +25,20 @@ export default function RestaurantDetail() {
 
   useEffect(() => {
     if (!restaurant) return;
-    const timeout = setTimeout(() => setQrReady(true), 150);
-    return () => clearTimeout(timeout);
+
+    let raf;
+    const timeout = setTimeout(() => {
+      raf = requestAnimationFrame(() => {
+        setQrReady(true);
+      });
+    }, 300); // puedes ajustar a 400 si sigue fallando
+
+    return () => {
+      clearTimeout(timeout);
+      cancelAnimationFrame(raf);
+    };
   }, [restaurant]);
+
 
   useEffect(() => {
     if (!qrReady || !qrRef.current) return;
@@ -164,6 +175,7 @@ export default function RestaurantDetail() {
     }
   });
 
+  const canRenderQR = restaurant && restaurant.name;
 
 
   return (
@@ -325,7 +337,7 @@ export default function RestaurantDetail() {
             alt="QR compuesto"
             className="rounded-2xl border-[6px] border-red-600 bg-red-600 inline-block"
           />
-        ) : (
+        ) : canRenderQR ? (
           <div
             ref={qrRef}
             className="inline-block border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
@@ -346,6 +358,8 @@ export default function RestaurantDetail() {
               <p className="text-sm font-light tracking-wide">GDLHUB</p>
             </div>
           </div>
+        ) : (
+          <p className="text-center text-sm text-gray-400 animate-pulse">Cargando QR...</p>
         )}
 
         <p className="text-sm text-gray-400">
