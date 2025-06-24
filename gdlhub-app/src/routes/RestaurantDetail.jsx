@@ -56,23 +56,22 @@ useEffect(() => {
     }
   };
 
-  const checkAndRender = () => {
-    const logo = qrRef.current.querySelector('img[src="/logo_qr.png"]');
-    if (logo && logo.complete && logo.naturalWidth > 0) {
-      renderQR();
-      return true;
-    }
-    return false;
-  };
-
-  if (checkAndRender()) return;
-
   const interval = setInterval(() => {
-    if (checkAndRender()) clearInterval(interval);
-  }, 200);
+    const logo = qrRef.current.querySelector('img[src="/logo_qr.png"]');
+    const canvas = qrRef.current.querySelector("canvas");
+
+    const logoOk = logo?.complete && logo.naturalWidth > 0;
+    const canvasOk = canvas instanceof HTMLCanvasElement;
+
+    if (logoOk && canvasOk) {
+      clearInterval(interval);
+      renderQR();
+    }
+  }, 500); // prueba incluso con 500ms si sigue fallando en dispositivos lentos
 
   return () => clearInterval(interval);
 }, [qrReady, restaurantUrl]);
+
 
 
 
@@ -383,7 +382,7 @@ useEffect(() => {
         )}
 
         <p className="text-sm text-gray-400">
-          TEST 1- Mantén presionado para guardar el QR
+          Mantén presionado para guardar el QR
         </p>
       </div>
 
