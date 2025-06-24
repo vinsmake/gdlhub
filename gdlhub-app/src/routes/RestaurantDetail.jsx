@@ -9,9 +9,6 @@ export default function RestaurantDetail() {
   const publicUrl = import.meta.env.VITE_PUBLIC_URL;
   const restaurantUrl = `${publicUrl}/restaurants/${rid}`;
   const qrRef = useRef(null);
-  const [finalImage, setFinalImage] = useState("");
-  const [qrReady, setQrReady] = useState(false);
-
 
   const [restaurant, setRestaurant] = useState(null);
   const [comments, setComments] = useState([]);
@@ -22,70 +19,6 @@ export default function RestaurantDetail() {
   const [showCommentLoginMessage, setShowCommentLoginMessage] = useState(false);
 
   const { user, token } = useUser();
-
-  useEffect(() => {
-    if (!restaurant) return;
-
-    let raf;
-    const timeout = setTimeout(() => {
-      raf = requestAnimationFrame(() => {
-        setQrReady(true);
-      });
-    }, 300); // puedes ajustar a 400 si sigue fallando
-
-    return () => {
-      clearTimeout(timeout);
-      cancelAnimationFrame(raf);
-    };
-  }, [restaurant]);
-
-
-useEffect(() => {
-  if (!qrReady || !qrRef.current) return;
-
-  const logo = qrRef.current.querySelector('img[src="/logo_qr.png"]');
-  const canvas = qrRef.current.querySelector("canvas");
-
-  const tryRender = () => {
-    const logoOk = logo?.complete && logo.naturalWidth > 0;
-    const canvasOk = canvas instanceof HTMLCanvasElement;
-
-    if (logoOk && canvasOk) {
-      toPng(qrRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        skipFonts: true,
-      }).then((dataUrl) => {
-        setFinalImage(dataUrl);
-      }).catch((err) => {
-        console.error("Error al generar QR:", err);
-      });
-      return true;
-    }
-    return false;
-  };
-
-  const check = () => {
-    if (tryRender()) return;
-    const interval = setInterval(() => {
-      if (tryRender()) clearInterval(interval);
-    }, 400);
-    return () => clearInterval(interval);
-  };
-
-  if (document.readyState === "complete") {
-    return check();
-  } else {
-    window.addEventListener("load", check);
-    return () => window.removeEventListener("load", check);
-  }
-}, [qrReady, restaurantUrl]);
-
-
-
-
-
-
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
@@ -116,22 +49,14 @@ useEffect(() => {
         pixelRatio: 2,
         skipFonts: true,
       });
-
-      const newWindow = window.open();
-      if (newWindow) {
-        newWindow.document.write(`<img src="${dataUrl}" alt="QR Code" />`);
-      } else {
-        // Fallback: descarga automática
-        const link = document.createElement("a");
-        link.download = `qr-${rid}.png`;
-        link.href = dataUrl;
-        link.click();
-      }
+      const link = document.createElement("a");
+      link.download = `qr-${rid}.png`;
+      link.href = dataUrl;
+      link.click();
     } catch (err) {
       console.error("Error al generar la imagen:", err);
     }
   };
-
 
   const handleSubmitComment = async () => {
     if (!user || !token) {
@@ -203,9 +128,6 @@ useEffect(() => {
       groupedMenu[cat].push(item);
     }
   });
-
-  const canRenderQR = restaurant && restaurant.name;
-
 
   return (
     <div className="bg-neutral-800 p-8 rounded-2xl shadow-xl text-white space-y-6 w-full max-w-7xl mx-auto px-4">
@@ -355,47 +277,29 @@ useEffect(() => {
 
       <div className="mt-10 text-center space-y-4">
         <h3 className="text-lg font-semibold text-gray-300">Escanea el QR para compartir</h3>
-
-        {!finalImage && (
-          <p className="text-center text-sm text-gray-400 animate-pulse">Generando QR...</p>
-        )}
-
-        {finalImage ? (
-          <img
-            src={finalImage}
-            alt="QR compuesto"
-            className="rounded-2xl border-[6px] border-red-600 bg-red-600 inline-block"
-          />
-        ) : canRenderQR ? (
-          <div
-            ref={qrRef}
-            className="inline-block border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
-            style={{ width: "max-content" }}
-          >
-            <div className="bg-white p-3">
-              <div className="relative w-[260px] h-[260px]">
-                <QRCodeCanvas value={restaurantUrl} size={260} />
-                <img
-                  src="/logo_qr.png"
-                  alt="Logo"
-                  className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                />
-              </div>
-            </div>
-            <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
-              <p className="text-base font-semibold">{restaurant.name}</p>
-              <p className="text-sm font-light tracking-wide">GDLHUB</p>
+        <div
+          ref={qrRef}
+          onClick={handleDownload}
+          className="inline-block cursor-pointer border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
+          style={{ width: "max-content" }}
+        >
+          <div className="bg-white p-3">
+            <div className="relative w-[260px] h-[260px]">
+              <QRCodeCanvas value={restaurantUrl} size={260} />
+              <img
+                src="/logo_qr.png"
+                alt="Logo"
+                className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
             </div>
           </div>
-        ) : (
-          <p className="text-center text-sm text-gray-400 animate-pulse">Cargando QR...</p>
-        )}
-
-        <p className="text-sm text-gray-400">
-          Test - 3 Mantén presionado para guardar el QR
-        </p>
+          <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
+            <p className="text-base font-semibold">{restaurant.name}</p>
+            <p className="text-sm font-light tracking-wide">GDLHUB</p>
+          </div>
+        </div>
+        <p className="text-sm text-gray-400">Toca el codigo QR para descargar</p>
       </div>
-
     </div>
   );
 }
