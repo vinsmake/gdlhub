@@ -43,7 +43,24 @@ export default function RestaurantDetail() {
   useEffect(() => {
     if (!qrReady || !qrRef.current) return;
 
-    const generateImage = async () => {
+    const waitForImageAndRender = async () => {
+      const logoEl = document.querySelector('img[src="/logo_qr.png"]');
+
+      if (!logoEl || !logoEl.complete) {
+        // espera hasta que esté montado y cargado
+        const interval = setInterval(() => {
+          const logo = document.querySelector('img[src="/logo_qr.png"]');
+          if (logo && logo.complete) {
+            clearInterval(interval);
+            renderQR();
+          }
+        }, 100);
+      } else {
+        renderQR();
+      }
+    };
+
+    const renderQR = async () => {
       try {
         const dataUrl = await toPng(qrRef.current, {
           cacheBust: true,
@@ -55,8 +72,10 @@ export default function RestaurantDetail() {
       }
     };
 
-    generateImage();
+    waitForImageAndRender();
   }, [qrReady, restaurantUrl]);
+
+
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
