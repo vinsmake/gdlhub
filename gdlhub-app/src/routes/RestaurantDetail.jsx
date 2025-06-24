@@ -10,24 +10,7 @@ export default function RestaurantDetail() {
   const restaurantUrl = `${publicUrl}/restaurants/${rid}`;
   const qrRef = useRef(null);
   const [finalImage, setFinalImage] = useState("");
-
-  useEffect(() => {
-    const generateImage = async () => {
-      if (!qrRef.current) return;
-      try {
-        const dataUrl = await toPng(qrRef.current, {
-          cacheBust: true,
-          pixelRatio: 2,
-        });
-        setFinalImage(dataUrl);
-      } catch (err) {
-        console.error("Error al generar imagen del QR:", err);
-      }
-    };
-
-    const timeout = setTimeout(generateImage, 300);
-    return () => clearTimeout(timeout);
-  }, [restaurantUrl]);
+  const [qrReady, setQrReady] = useState(false);
 
 
   const [restaurant, setRestaurant] = useState(null);
@@ -40,7 +23,29 @@ export default function RestaurantDetail() {
 
   const { user, token } = useUser();
 
+  useEffect(() => {
+    if (!restaurant) return;
+    const timeout = setTimeout(() => setQrReady(true), 150);
+    return () => clearTimeout(timeout);
+  }, [restaurant]);
 
+  useEffect(() => {
+    if (!qrReady || !qrRef.current) return;
+
+    const generateImage = async () => {
+      try {
+        const dataUrl = await toPng(qrRef.current, {
+          cacheBust: true,
+          pixelRatio: 2,
+        });
+        setFinalImage(dataUrl);
+      } catch (err) {
+        console.error("Error al generar imagen del QR:", err);
+      }
+    };
+
+    generateImage();
+  }, [qrReady, restaurantUrl]);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
@@ -309,6 +314,10 @@ export default function RestaurantDetail() {
 
       <div className="mt-10 text-center space-y-4">
         <h3 className="text-lg font-semibold text-gray-300">Escanea el QR para compartir</h3>
+
+        {!finalImage && (
+          <p className="text-center text-sm text-gray-400 animate-pulse">Generando QR...</p>
+        )}
 
         {finalImage ? (
           <img
