@@ -3,7 +3,6 @@ import { QRCodeCanvas } from "qrcode.react";
 import { toPng } from "html-to-image";
 import { useRef, useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
-import RestaurantQR from "./RestaurantQr";
 
 export default function RestaurantDetail() {
   const { rid } = useParams();
@@ -284,7 +283,31 @@ const handleDownload = async () => {
         </div>
       )}
 
-      <RestaurantQR restaurantUrl={restaurantUrl} restaurant={restaurant} />
+      <div className="mt-10 text-center space-y-4">
+        <h3 className="text-lg font-semibold text-gray-300">Escanea el QR para compartir</h3>
+        <div
+          ref={qrRef}
+          onClick={handleDownload}
+          className="inline-block cursor-pointer border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
+          style={{ width: "max-content" }}
+        >
+          <div className="bg-white p-3">
+            <div className="relative w-[260px] h-[260px]">
+              <QRCodeCanvas value={restaurantUrl} size={260} />
+              <img
+                src="/logo_qr.png"
+                alt="Logo"
+                className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
+            </div>
+          </div>
+          <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
+            <p className="text-base font-semibold">{restaurant.name}</p>
+            <p className="text-sm font-light tracking-wide">GDLHUB</p>
+          </div>
+        </div>
+        <p className="text-sm text-gray-400">Toca el codigo QR para descargar</p>
+      </div>
     </div>
   );
 }
