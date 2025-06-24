@@ -382,7 +382,7 @@ useEffect(() => {
         )}
 
         <p className="text-sm text-gray-400">
-          Mantén presionado para guardar el QR
+          Test - 2 Mantén presionado para guardar el QR
         </p>
       </div>
 
