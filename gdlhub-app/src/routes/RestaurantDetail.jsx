@@ -43,34 +43,44 @@ export default function RestaurantDetail() {
 useEffect(() => {
   if (!qrReady || !qrRef.current) return;
 
-  const renderQR = async () => {
-    try {
-      const dataUrl = await toPng(qrRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        skipFonts: true,
-      });
-      setFinalImage(dataUrl);
-    } catch (err) {
-      console.error("Error al generar imagen del QR:", err);
-    }
-  };
+  const logo = qrRef.current.querySelector('img[src="/logo_qr.png"]');
+  const canvas = qrRef.current.querySelector("canvas");
 
-  const interval = setInterval(() => {
-    const logo = qrRef.current.querySelector('img[src="/logo_qr.png"]');
-    const canvas = qrRef.current.querySelector("canvas");
-
+  const tryRender = () => {
     const logoOk = logo?.complete && logo.naturalWidth > 0;
     const canvasOk = canvas instanceof HTMLCanvasElement;
 
     if (logoOk && canvasOk) {
-      clearInterval(interval);
-      renderQR();
+      toPng(qrRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        skipFonts: true,
+      }).then((dataUrl) => {
+        setFinalImage(dataUrl);
+      }).catch((err) => {
+        console.error("Error al generar QR:", err);
+      });
+      return true;
     }
-  }, 500); // prueba incluso con 500ms si sigue fallando en dispositivos lentos
+    return false;
+  };
 
-  return () => clearInterval(interval);
+  const check = () => {
+    if (tryRender()) return;
+    const interval = setInterval(() => {
+      if (tryRender()) clearInterval(interval);
+    }, 400);
+    return () => clearInterval(interval);
+  };
+
+  if (document.readyState === "complete") {
+    return check();
+  } else {
+    window.addEventListener("load", check);
+    return () => window.removeEventListener("load", check);
+  }
 }, [qrReady, restaurantUrl]);
+
 
 
 
@@ -382,7 +392,7 @@ useEffect(() => {
         )}
 
         <p className="text-sm text-gray-400">
-          Test - 2 Mantén presionado para guardar el QR
+          Test - 3 Mantén presionado para guardar el QR
         </p>
       </div>
 
