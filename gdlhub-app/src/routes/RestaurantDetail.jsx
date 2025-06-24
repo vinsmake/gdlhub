@@ -323,7 +323,7 @@ export default function RestaurantDetail() {
             style={{ width: "max-content" }}
           >
             <div className="bg-white p-3">
-              <div className="relative w-[360px] h-[260px]">
+              <div className="relative w-[260px] h-[260px]">
                 <QRCodeCanvas value={restaurantUrl} size={260} />
                 <img
                   src="/logo_qr.png"
