@@ -284,12 +284,12 @@ export default function RestaurantDetail() {
           style={{ width: "max-content" }}
         >
           <div className="bg-white p-3">
-            <div className="relative w-[300px] h-[300px]">
-              <QRCodeCanvas value={restaurantUrl} size={300} />
+            <div className="relative w-[260px] h-[260px]">
+              <QRCodeCanvas value={restaurantUrl} size={260} />
               <img
                 src="/logo_qr.png"
                 alt="Logo"
-                className="w-16 h-16 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function RestaurantDetail() {
             <p className="text-sm font-light tracking-wide">GDLHUB</p>
           </div>
         </div>
-        <p className="text-sm text-gray-400">Mantén pulsado para compartir o toca para descargar</p>
+        <p className="text-sm text-gray-400">Toca el codigo QR para descargar</p>
       </div>
     </div>
   );
