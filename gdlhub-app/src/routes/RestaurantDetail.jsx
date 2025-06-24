@@ -10,24 +10,8 @@ export default function RestaurantDetail() {
   const restaurantUrl = `${publicUrl}/restaurants/${rid}`;
   const qrRef = useRef(null);
   const [finalImage, setFinalImage] = useState("");
-
-  useEffect(() => {
-    const generateImage = async () => {
-      if (!qrRef.current) return;
-      try {
-        const dataUrl = await toPng(qrRef.current, {
-          cacheBust: true,
-          pixelRatio: 2,
-        });
-        setFinalImage(dataUrl);
-      } catch (err) {
-        console.error("Error al generar imagen del QR:", err);
-      }
-    };
-
-    const timeout = setTimeout(generateImage, 300);
-    return () => clearTimeout(timeout);
-  }, [restaurantUrl]);
+  const [logoReady, setLogoReady] = useState(false);
+  const [qrReady, setQrReady] = useState(false);
 
 
   const [restaurant, setRestaurant] = useState(null);
@@ -41,6 +25,36 @@ export default function RestaurantDetail() {
   const { user, token } = useUser();
 
 
+  useEffect(() => {
+    if (!qrRef.current || !logoReady || !qrReady) return;
+
+    const generateImage = async () => {
+      try {
+        const dataUrl = await toPng(qrRef.current, {
+          cacheBust: true,
+          pixelRatio: 2,
+          skipFonts: true,
+        });
+        setFinalImage(dataUrl);
+      } catch (err) {
+        console.error("Error al generar imagen del QR:", err);
+      }
+    };
+
+    // Espera un poco para evitar capturar medio render
+    const timeout = setTimeout(generateImage, 100);
+    return () => clearTimeout(timeout);
+  }, [restaurantUrl, logoReady, qrReady]);
+
+  useEffect(() => {
+    // Marca QR como "renderizado" cuando aparece por primera vez
+    if (!finalImage) {
+      const timeout = setTimeout(() => {
+        setQrReady(true);
+      }, 50);
+      return () => clearTimeout(timeout);
+    }
+  }, [finalImage]);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
@@ -324,12 +338,14 @@ export default function RestaurantDetail() {
           >
             <div className="bg-white p-3">
               <div className="relative w-[260px] h-[260px]">
-                <QRCodeCanvas value={restaurantUrl} size={260} />
+                <QRCodeCanvas value={restaurantUrl} size={260} onRendered={() => setQrReady(true)} />
                 <img
                   src="/logo_qr.png"
                   alt="Logo"
+                  onLoad={() => setLogoReady(true)}
                   className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 />
+
               </div>
             </div>
             <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
