@@ -12,6 +12,8 @@ export default function RestaurantDetail() {
   const [finalImage, setFinalImage] = useState("");
   const [logoReady, setLogoReady] = useState(false);
   const [qrReady, setQrReady] = useState(false);
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const [qrCanvasReady, setQrCanvasReady] = useState(false);
 
 
   const [restaurant, setRestaurant] = useState(null);
@@ -24,9 +26,22 @@ export default function RestaurantDetail() {
 
   const { user, token } = useUser();
 
-
   useEffect(() => {
-    if (!qrRef.current || !logoReady || !qrReady) return;
+    if (!logoLoaded || !qrRef.current) return;
+
+    const canvas = qrRef.current.querySelector("canvas");
+    if (!canvas) return;
+
+    let tries = 0;
+    const checkCanvasPainted = () => {
+      const isReady = canvas.toDataURL().length > 1000; // blanco suele ser muy corto
+      if (isReady || tries > 20) {
+        generateImage();
+      } else {
+        tries++;
+        setTimeout(checkCanvasPainted, 100);
+      }
+    };
 
     const generateImage = async () => {
       try {
@@ -37,14 +52,35 @@ export default function RestaurantDetail() {
         });
         setFinalImage(dataUrl);
       } catch (err) {
-        console.error("Error al generar imagen del QR:", err);
+        console.error("Error al generar la imagen del QR:", err);
       }
     };
 
-    // Espera un poco para evitar capturar medio render
+    checkCanvasPainted();
+  }, [logoLoaded, restaurantUrl]);
+
+
+  useEffect(() => {
+    if (!qrRef.current || !logoLoaded || !qrCanvasReady) return;
+
+    const generateImage = async () => {
+      try {
+        const dataUrl = await toPng(qrRef.current, {
+          cacheBust: true,
+          pixelRatio: 2,
+          skipFonts: true,
+        });
+        setFinalImage(dataUrl);
+      } catch (err) {
+        console.error("Error al generar la imagen del QR:", err);
+      }
+    };
+
+    // espera pequeño margen extra
     const timeout = setTimeout(generateImage, 100);
     return () => clearTimeout(timeout);
-  }, [restaurantUrl, logoReady, qrReady]);
+  }, [logoLoaded, qrCanvasReady, restaurantUrl]);
+
 
   useEffect(() => {
     // Marca QR como "renderizado" cuando aparece por primera vez
@@ -338,14 +374,13 @@ export default function RestaurantDetail() {
           >
             <div className="bg-white p-3">
               <div className="relative w-[260px] h-[260px]">
-                <QRCodeCanvas value={restaurantUrl} size={260} onRendered={() => setQrReady(true)} />
+                <QRCodeCanvas value={restaurantUrl} size={260} />
                 <img
                   src="/logo_qr.png"
                   alt="Logo"
-                  onLoad={() => setLogoReady(true)}
+                  onLoad={() => setLogoLoaded(true)}
                   className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                 />
-
               </div>
             </div>
             <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
@@ -353,6 +388,7 @@ export default function RestaurantDetail() {
               <p className="text-sm font-light tracking-wide">GDLHUB</p>
             </div>
           </div>
+
         )}
 
         <p className="text-sm text-gray-400">
