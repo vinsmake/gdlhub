@@ -17,7 +17,7 @@
     "db:restore": "docker exec -i gdlhub-postgres psql -U gdlhub -d gdlhub_db < ./backups/backup_gdlhub.sql",
     "db:backup:all": "docker exec gdlhub-postgres pg_dumpall -U gdlhub > ./backups/full_backup_all.sql",
     "db:restore:all": "docker exec -i gdlhub-postgres psql -U gdlhub -d postgres < ./backups/full_backup_all.sql",
-    "dockercompose:rebuild": "docker-compose down --volumes --rmi all && docker-compose up --build -d",
+    "dockercompose:rebuild": "docker compose down --volumes --rmi all && docker compose up --build -d",
     "dockercompose:down": "docker-compose down --volumes --rmi all",
     "dockercompose:build": "docker compose up --build -d",
     "server:front": "http-server gdlhub-app/dist",
