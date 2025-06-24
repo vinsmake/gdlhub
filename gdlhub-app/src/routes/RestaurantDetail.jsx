@@ -51,7 +51,7 @@ export default function RestaurantDetail() {
   useEffect(() => {
     if (!isMobile) return;
     let attempts = 0;
-    const maxAttempts = 6; // 6 intentos (5s * 6 = 30s)
+    const maxAttempts = 4; // 4 intentos (5s * 4 = 20s)
 
     const interval = setInterval(() => {
       attempts += 1;
