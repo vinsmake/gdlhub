@@ -41,39 +41,44 @@ export default function RestaurantDetail() {
 
 
   useEffect(() => {
-    if (!qrReady || !qrRef.current) return;
+  if (!qrReady || !qrRef.current) return;
 
-    const waitForImageAndRender = async () => {
-      const logoEl = document.querySelector('img[src="/logo_qr.png"]');
+  let observer;
 
-      if (!logoEl || !logoEl.complete) {
-        // espera hasta que esté montado y cargado
-        const interval = setInterval(() => {
-          const logo = document.querySelector('img[src="/logo_qr.png"]');
-          if (logo && logo.complete) {
-            clearInterval(interval);
-            renderQR();
-          }
-        }, 100);
-      } else {
+  const renderQR = async () => {
+    try {
+      const dataUrl = await toPng(qrRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+      });
+      setFinalImage(dataUrl);
+    } catch (err) {
+      console.error("Error al generar imagen del QR:", err);
+    }
+  };
+
+  const logo = document.querySelector('img[src="/logo_qr.png"]');
+
+  if (logo && logo.complete) {
+    renderQR();
+  } else {
+    observer = new MutationObserver(() => {
+      const logo = document.querySelector('img[src="/logo_qr.png"]');
+      if (logo && logo.complete) {
+        observer.disconnect();
         renderQR();
       }
-    };
+    });
 
-    const renderQR = async () => {
-      try {
-        const dataUrl = await toPng(qrRef.current, {
-          cacheBust: true,
-          pixelRatio: 2,
-        });
-        setFinalImage(dataUrl);
-      } catch (err) {
-        console.error("Error al generar imagen del QR:", err);
-      }
-    };
+    observer.observe(qrRef.current, {
+      childList: true,
+      subtree: true,
+    });
+  }
 
-    waitForImageAndRender();
-  }, [qrReady, restaurantUrl]);
+  return () => observer?.disconnect?.();
+}, [qrReady, restaurantUrl]);
+
 
 
 
