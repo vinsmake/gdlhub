@@ -18,7 +18,10 @@ export default function RestaurantDetail() {
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [showCommentLoginMessage, setShowCommentLoginMessage] = useState(false);
 
+
   const [finalImage, setFinalImage] = useState(null);
+  const [showOriginalQR, setShowOriginalQR] = useState(true);
+
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 
@@ -48,16 +51,20 @@ export default function RestaurantDetail() {
   useEffect(() => {
     if (!isMobile) return;
     let attempts = 0;
-    const maxAttempts = 6; // 6 intentos cada 5s = 30 segundos
+    const maxAttempts = 6; // 6 intentos (5s * 6 = 30s)
 
     const interval = setInterval(() => {
       attempts += 1;
       handleDownload();
-      if (attempts >= maxAttempts) clearInterval(interval);
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setShowOriginalQR(false); // ⬅️ ocultar el original QR
+      }
     }, 5000);
 
-    return () => clearInterval(interval); // limpieza por si se desmonta antes
-  }, [restaurant]); // solo cuando el restaurante se haya cargado
+    return () => clearInterval(interval);
+  }, [restaurant]);
+
 
 
   const handleDownload = async () => {
@@ -302,27 +309,30 @@ export default function RestaurantDetail() {
 
       <div className="mt-10 text-center space-y-4">
         <h3 className="text-lg font-semibold text-gray-300">Escanea el QR para compartir</h3>
-        <div
-          ref={qrRef}
-          onClick={handleDownload}
-          className="inline-block cursor-pointer border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
-          style={{ width: "max-content" }}
-        >
-          <div className="bg-white p-3">
-            <div className="relative w-[260px] h-[260px]">
-              <QRCodeCanvas value={restaurantUrl} size={260} />
-              <img
-                src="/logo_qr.png"
-                alt="Logo"
-                className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-              />
+        {showOriginalQR && (
+          <div
+            ref={qrRef}
+            onClick={handleDownload}
+            className="inline-block cursor-pointer border-[6px] border-red-600 bg-red-600 rounded-2xl overflow-hidden"
+            style={{ width: "max-content" }}
+          >
+            <div className="bg-white p-3">
+              <div className="relative w-[260px] h-[260px]">
+                <QRCodeCanvas value={restaurantUrl} size={260} />
+                <img
+                  src="/logo_qr.png"
+                  alt="Logo"
+                  className="w-12 h-12 object-contain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                />
+              </div>
+            </div>
+            <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
+              <p className="text-base font-semibold">{restaurant.name}</p>
+              <p className="text-sm font-light tracking-wide">GDLHUB</p>
             </div>
           </div>
-          <div className="bg-red-600 text-white py-3 px-4 text-center space-y-1">
-            <p className="text-base font-semibold">{restaurant.name}</p>
-            <p className="text-sm font-light tracking-wide">GDLHUB</p>
-          </div>
-        </div>
+        )}
+
         <p className="text-sm text-gray-400">Toca el codigo QR para descargar</p>
         {isMobile && finalImage && (
           <div className="mt-6 text-center">
