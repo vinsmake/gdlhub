@@ -40,16 +40,15 @@ export default function RestaurantDetail() {
   }, [restaurant]);
 
 
-  useEffect(() => {
+useEffect(() => {
   if (!qrReady || !qrRef.current) return;
-
-  let observer;
 
   const renderQR = async () => {
     try {
       const dataUrl = await toPng(qrRef.current, {
         cacheBust: true,
         pixelRatio: 2,
+        skipFonts: true,
       });
       setFinalImage(dataUrl);
     } catch (err) {
@@ -57,27 +56,24 @@ export default function RestaurantDetail() {
     }
   };
 
-  const logo = document.querySelector('img[src="/logo_qr.png"]');
+  const checkAndRender = () => {
+    const logo = qrRef.current.querySelector('img[src="/logo_qr.png"]');
+    if (logo && logo.complete && logo.naturalWidth > 0) {
+      renderQR();
+      return true;
+    }
+    return false;
+  };
 
-  if (logo && logo.complete) {
-    renderQR();
-  } else {
-    observer = new MutationObserver(() => {
-      const logo = document.querySelector('img[src="/logo_qr.png"]');
-      if (logo && logo.complete) {
-        observer.disconnect();
-        renderQR();
-      }
-    });
+  if (checkAndRender()) return;
 
-    observer.observe(qrRef.current, {
-      childList: true,
-      subtree: true,
-    });
-  }
+  const interval = setInterval(() => {
+    if (checkAndRender()) clearInterval(interval);
+  }, 200);
 
-  return () => observer?.disconnect?.();
+  return () => clearInterval(interval);
 }, [qrReady, restaurantUrl]);
+
 
 
 
@@ -387,7 +383,7 @@ export default function RestaurantDetail() {
         )}
 
         <p className="text-sm text-gray-400">
-          Mantén presionado para guardar el QR
+          TEST 1- Mantén presionado para guardar el QR
         </p>
       </div>
 
