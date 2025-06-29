@@ -19,7 +19,7 @@ services:
     command: >
       sh -c "npm install &&
              if [ \"$MODE\" = 'production' ]; then
-               npm run build && npm run preview -- --host;
+               npm run build;
              else
                npm run dev;
              fi"
