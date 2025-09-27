@@ -38,7 +38,9 @@ export const FriendsPage = () => {
                   {item.type === "comment" && (
                     <>
                       <p className="text-sm text-gray-400">
-                        <strong className="text-white">{item.user_name}</strong> comentó en{" "}
+                        <Link to={`/users/${item.user_id}`} className="text-white hover:text-gray-300 font-bold">
+                          {item.user_name}
+                        </Link> comentó en{" "}
                         <Link to={`/restaurants/${item.restaurant_id}`} className="text-white underline">
                           {item.restaurant_name}
                         </Link>:
@@ -73,7 +75,9 @@ export const FriendsPage = () => {
                       )}
                       <div className="flex-1 space-y-2">
                         <p className="text-sm text-gray-400">
-                          <strong className="text-white">{item.user_name}</strong> marcó como favorito{" "}
+                          <Link to={`/users/${item.user_id}`} className="text-white hover:text-gray-300 font-bold">
+                            {item.user_name}
+                          </Link> marcó como favorito{" "}
                           <Link to={`/restaurants/${item.restaurant_id}`} className="text-white underline">
                             {item.restaurant_name}
                           </Link>

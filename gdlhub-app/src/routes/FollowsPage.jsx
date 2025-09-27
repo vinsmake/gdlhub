@@ -40,7 +40,9 @@ export const FollowsPage = () => {
                   {item.type === "comment" && (
                     <>
                       <p className="text-sm text-gray-400">
-                        <strong className="text-white">{item.user_name}</strong> comentó en{" "}
+                        <Link to={`/users/${item.user_id}`} className="text-white hover:text-gray-300 font-bold">
+                          {item.user_name}
+                        </Link> comentó en{" "}
                         <Link
                           to={`/restaurants/${item.restaurant_id}`}
                           className="text-white underline"
@@ -82,7 +84,9 @@ export const FollowsPage = () => {
                       )}
                       <div className="flex-1 space-y-2">
                         <p className="text-sm text-gray-400">
-                          <strong className="text-white">{item.user_name}</strong> marcó como favorito{" "}
+                          <Link to={`/users/${item.user_id}`} className="text-white hover:text-gray-300 font-bold">
+                            {item.user_name}
+                          </Link> marcó como favorito{" "}
                           <Link
                             to={`/restaurants/${item.restaurant_id}`}
                             className="text-white underline"
@@ -103,7 +107,9 @@ export const FollowsPage = () => {
                   {/* Seguimiento */}
                   {item.type === "followed" && (
                     <p className="text-sm text-gray-400">
-                      <strong className="text-white">{item.user_name}</strong> empezó a seguir a{" "}
+                      <Link to={`/users/${item.user_id}`} className="text-white hover:text-gray-300 font-bold">
+                        {item.user_name}
+                      </Link> empezó a seguir a{" "}
                       <span className="text-white">{item.content}</span>
                     </p>
                   )}

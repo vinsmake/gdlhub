@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, Link } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { getAvatarUrl } from "../../utils/avatarUtils";
 
@@ -126,7 +126,12 @@ export const DashboardSidebar = () => {
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div className="flex-1">
-                <p className="text-white font-semibold">{user.name}</p>
+                <Link 
+                  to={`/users/${user.id}`}
+                  className="text-white font-semibold hover:text-red-400 transition-colors block"
+                >
+                  {user.name}
+                </Link>
                 <button
                   onClick={() => {
                     logout();

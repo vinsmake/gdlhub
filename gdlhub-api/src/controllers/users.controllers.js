@@ -347,3 +347,55 @@ export const uploadUserAvatar = async (req, res) => {
   }
 };
 
+// Obtener restaurantes guardados de un usuario
+export const getUserSavedRestaurants = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    
+    const { rows } = await pool.query(`
+      SELECT 
+        r.id, 
+        r.name, 
+        r.image, 
+        r.description,
+        COALESCE(ROUND(AVG(rt.rating), 1), 0) as avg_rating,
+        COUNT(rt.rating) as total_ratings
+      FROM favorite_restaurants fr
+      JOIN restaurants r ON fr.restaurant_id = r.id
+      LEFT JOIN restaurant_ratings rt ON r.id = rt.restaurant_id
+      WHERE fr.user_id = $1
+      GROUP BY r.id, r.name, r.image, r.description, fr.created_at
+      ORDER BY fr.created_at DESC
+    `, [uid]);
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ [SAVED_RESTAURANTS] Error:', error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Obtener personas seguidas por un usuario
+export const getUserFollowing = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    
+    const { rows } = await pool.query(`
+      SELECT 
+        u.id, 
+        u.name, 
+        u.email,
+        u.avatar
+      FROM user_follows uf
+      JOIN users u ON uf.followed_id = u.id
+      WHERE uf.follower_id = $1
+      ORDER BY uf.created_at DESC
+    `, [uid]);
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ [USER_FOLLOWING] Error:', error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+

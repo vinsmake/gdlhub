@@ -6,7 +6,7 @@ export const getRestaurantComments = async (req, res) => {
   const { rid } = req.params;
   try {
     const { rows } = await pool.query(`
-      SELECT c.id, c.content, c.created_at, u.name AS user_name, u.avatar
+      SELECT c.id, c.content, c.created_at, c.user_id, u.name AS user_name, u.avatar
       FROM comments c
       JOIN users u ON u.id = c.user_id
       WHERE c.restaurant_id = $1

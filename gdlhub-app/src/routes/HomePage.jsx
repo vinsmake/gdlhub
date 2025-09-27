@@ -185,8 +185,13 @@ export const HomePage = () => {
                     {item.type === "comment" && (
                       <>
                         <p className="text-sm text-gray-400">
-                          <strong className="text-white">{item.user_name}</strong> comentó en{" "}
-                          <Link to={`/restaurants/${item.restaurant_id}`} className="text-white underline">
+                          <Link 
+                            to={`/users/${item.user_id}`} 
+                            className="text-white font-bold hover:text-red-400 transition-colors"
+                          >
+                            {item.user_name}
+                          </Link> comentó en{" "}
+                          <Link to={`/restaurants/${item.restaurant_id}`} className="text-white underline hover:text-red-400 transition-colors">
                             {item.restaurant_name}
                           </Link>:
                         </p>
