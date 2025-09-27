@@ -157,7 +157,7 @@ export const loginUser = async (req, res) => {
 export const registerUser = async (req, res) => {
   try {
     console.log('📝 [REGISTER] Iniciando proceso de registro...');
-    const { name, email, password, avatar } = req.body;
+    const { name, email, password } = req.body;
 
     // Validaciones
     if (!name || !email || !password) {
@@ -185,12 +185,19 @@ export const registerUser = async (req, res) => {
     // Hashear la contraseña
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Manejar avatar si se subió
+    let avatarPath = null;
+    if (req.file) {
+      avatarPath = `/uploads/avatars/${req.file.filename}`;
+      console.log('📷 [REGISTER] Avatar subido:', avatarPath);
+    }
+
     // Guardar datos temporalmente en tabla de verificaciones
     const userData = {
       name,
       email,
       password_hash: passwordHash,
-      avatar: avatar || null
+      avatar: avatarPath
     };
 
     // Limpiar verificaciones anteriores para este email
@@ -284,6 +291,59 @@ export const verifyEmailAndRegister = async (req, res) => {
     }
     console.error('❌ [VERIFY] Error en verificación:', error);
     res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Subir avatar de usuario
+export const uploadUserAvatar = async (req, res) => {
+  try {
+    console.log("📷 [AVATAR] Iniciando subida de avatar...");
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No se proporcionó ningún archivo de imagen"
+      });
+    }
+
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "ID de usuario requerido"
+      });
+    }
+
+    const avatarPath = `/uploads/avatars/${req.file.filename}`;
+    
+    // Actualizar la base de datos con la ruta del avatar
+    const { rows } = await pool.query(
+      'UPDATE users SET avatar = $1 WHERE id = $2 RETURNING id, name, email, avatar',
+      [avatarPath, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado"
+      });
+    }
+
+    console.log("✅ [AVATAR] Avatar subido exitosamente:", avatarPath);
+    
+    res.json({
+      success: true,
+      message: "Avatar subido exitosamente",
+      user: rows[0],
+      avatarUrl: avatarPath
+    });
+
+  } catch (error) {
+    console.error('❌ [AVATAR] Error subiendo avatar:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor"
+    });
   }
 };
 

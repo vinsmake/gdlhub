@@ -7,9 +7,9 @@ export default function RegisterPage() {
     name: "", 
     email: "", 
     password: "",
-    confirmPassword: "",
-    avatar: ""
+    confirmPassword: ""
   });
+  const [avatarFile, setAvatarFile] = useState(null);
   const [verificationStep, setVerificationStep] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [error, setError] = useState(null);
@@ -20,6 +20,14 @@ export default function RegisterPage() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleAvatarChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setAvatarFile(e.target.files[0]);
+    } else {
+      setAvatarFile(null);
+    }
   };
 
   const validateForm = () => {
@@ -54,16 +62,17 @@ export default function RegisterPage() {
 
     try {
       console.log('📝 [REGISTER] Enviando datos de registro...');
-      
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('email', form.email);
+      formData.append('password', form.password);
+      if (avatarFile) {
+        formData.append('avatar', avatarFile);
+      }
+
       const res = await fetch(`${import.meta.env.VITE_API_BASE}/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          password: form.password,
-          avatar: form.avatar || null
-        }),
+        body: formData,
       });
 
       const data = await res.json();
@@ -75,8 +84,6 @@ export default function RegisterPage() {
       }
 
       console.log('✅ [REGISTER] Email de verificación enviado');
-      console.log('🔗 [REGISTER] Preview URL:', data.previewUrl); // Para testing
-      
       setEmailSent(true);
       setVerificationStep(true);
 
@@ -239,12 +246,11 @@ export default function RegisterPage() {
           />
           
           <input
-            type="text"
+            type="file"
             name="avatar"
-            placeholder="Avatar (opcional - ej: pc1.jpg)"
+            accept="image/*"
             className="w-full p-3 bg-neutral-700 rounded border border-neutral-600 focus:border-red-500 focus:outline-none"
-            onChange={handleChange}
-            value={form.avatar}
+            onChange={handleAvatarChange}
           />
         </div>
 

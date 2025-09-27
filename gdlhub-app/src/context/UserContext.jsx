@@ -119,8 +119,15 @@ export const UserProvider = ({ children }) => {
     console.log('🧹 [USER_CONTEXT] Sesión limpiada del localStorage');
   };
 
+  const updateUser = (updatedUser) => {
+    console.log('👤 [USER_CONTEXT] Actualizando datos del usuario...');
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    console.log('💾 [USER_CONTEXT] Usuario actualizado en localStorage');
+  };
+
   return (
-    <UserContext.Provider value={{ user, token, login, logout }}>
+    <UserContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );
