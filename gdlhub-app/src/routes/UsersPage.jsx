@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { getAvatarUrl } from "../utils/avatarUtils";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -32,7 +34,7 @@ export default function UsersPage() {
               >
                 <div className="flex items-start gap-4">
                   <img
-                    src={`${import.meta.env.VITE_API_BASE}/img/user/${item.avatar}`}
+                    src={getAvatarUrl(item.avatar)}
                     alt={item.user_name}
                     className="w-14 h-14 rounded-full object-cover"
                   />

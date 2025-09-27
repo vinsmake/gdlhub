@@ -3,6 +3,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { toPng } from "html-to-image";
 import { useRef, useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
+import { getAvatarUrl } from "../utils/avatarUtils";
 
 export default function RestaurantDetail() {
   const { rid } = useParams();
@@ -285,7 +286,7 @@ export default function RestaurantDetail() {
             {comments.map((c) => (
               <div key={c.id} className="bg-neutral-700 p-4 rounded-xl shadow-md text-white space-y-1">
                 <div className="flex items-center gap-3">
-                  <img src={`${import.meta.env.VITE_API_BASE}/img/user/${c.avatar}`} alt={c.user_name} className="w-10 h-10 rounded-full object-cover" />
+                  <img src={getAvatarUrl(c.avatar)} alt={c.user_name} className="w-10 h-10 rounded-full object-cover" />
                   <div>
                     <p className="font-medium text-white">{c.user_name}</p>
                     <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>

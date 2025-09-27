@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import AvatarUpload from "../components/AvatarUpload";
+import { getAvatarUrl } from "../utils/avatarUtils";
 
 export default function UserDetail() {
   const { uid } = useParams(); // ← para obtener el ID de la URL
@@ -74,10 +75,7 @@ export default function UserDetail() {
         ) : (
           <div className="flex items-center space-x-4">
             <img
-              src={viewedUser.avatar 
-                ? `${import.meta.env.VITE_API_BASE}${viewedUser.avatar}`
-                : `${import.meta.env.VITE_API_BASE}/img/user/pc1.jpg`
-              }
+              src={getAvatarUrl(viewedUser.avatar)}
               alt={viewedUser.name}
               className="w-16 h-16 rounded-full object-cover"
             />

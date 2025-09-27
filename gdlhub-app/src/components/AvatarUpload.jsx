@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
+import { getAvatarUrl } from "../utils/avatarUtils";
 
 export default function AvatarUpload({ currentUser, onAvatarUpdate }) {
   const [isUploading, setIsUploading] = useState(false);
@@ -76,10 +77,7 @@ export default function AvatarUpload({ currentUser, onAvatarUpdate }) {
       <div className="flex items-center space-x-4">
         <div className="relative">
           <img
-            src={currentUser.avatar 
-              ? `${import.meta.env.VITE_API_BASE}${currentUser.avatar}`
-              : `${import.meta.env.VITE_API_BASE}/img/user/pc1.jpg`
-            }
+            src={getAvatarUrl(currentUser.avatar)}
             alt={currentUser.name}
             className="w-20 h-20 rounded-full object-cover border-2 border-gray-600"
           />

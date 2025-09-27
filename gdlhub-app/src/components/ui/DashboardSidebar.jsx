@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 
 /* Logos */
 import {
@@ -120,7 +121,7 @@ export const DashboardSidebar = () => {
           {user ? (
             <div className="flex items-center gap-3 p-4 border-t border-neutral-700 mt-4">
               <img
-                src={`${import.meta.env.VITE_API_BASE}/img/user/${user.avatar}`}
+                src={getAvatarUrl(user.avatar)}
                 alt={user.name}
                 className="w-12 h-12 rounded-full object-cover"
               />

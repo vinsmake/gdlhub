@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getAvatarUrl } from "../utils/avatarUtils";
 import { useUser } from "../context/UserContext";
 
 export const FriendsPage = () => {
@@ -29,7 +30,7 @@ export const FriendsPage = () => {
             >
               <div className="flex items-start gap-4">
                 <img
-                  src={`${import.meta.env.VITE_API_BASE}/img/user/${item.avatar}`}
+                  src={getAvatarUrl(item.avatar)}
                   alt={item.user_name}
                   className="w-14 h-14 rounded-full object-cover"
                 />
