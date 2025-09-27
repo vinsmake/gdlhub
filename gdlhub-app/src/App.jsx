@@ -13,6 +13,7 @@ import { SavedPage } from "./routes/SavedPage";
 import { SearchPage } from "./routes/SearchPage";
 import CreateUserPage from "./routes/CreateUserPage";
 import LoginPage from "./routes/LoginPage";
+import RegisterPage from "./routes/RegisterPage";
 import { HomePage } from "./routes/HomePage";
 
 
@@ -34,7 +35,8 @@ const router = createBrowserRouter([
       { path: "/friends", element: <FriendsPage /> },
       { path: "/saved", element: <SavedPage /> },
       { path: "/search", element: <SearchPage /> },
-      { path: "login", element: <LoginPage /> }
+      { path: "login", element: <LoginPage /> },
+      { path: "register", element: <RegisterPage /> }
 
     ],
   },

@@ -60,6 +60,17 @@ export default function LoginPage() {
       >
         Entrar
       </button>
+      
+      <div className="text-center">
+        <p className="text-gray-400 mb-3">¿No tienes cuenta?</p>
+        <button
+          type="button"
+          onClick={() => navigate("/register")}
+          className="w-full bg-gray-600 hover:bg-gray-500 transition-colors text-white font-semibold py-3 rounded"
+        >
+          Crear Cuenta
+        </button>
+      </div>
     </form>
   );
 }

@@ -1,6 +1,7 @@
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generateToken.js";
+import { sendVerificationEmail, generateVerificationCode } from "../services/emailService.js";
 
 
 export const getUsers = async (req, res) => {
@@ -19,7 +20,7 @@ export const getUserById = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, avatar } = req.body;
 
     if (!password || password.length < 6) {
       return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres." });
@@ -28,17 +29,28 @@ export const createUser = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const { rows } = await pool.query(
-      `INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, avatar`,
-      [name, email, hash]
+      `INSERT INTO users (name, email, password_hash, avatar) VALUES ($1, $2, $3, $4) RETURNING id, name, email, avatar`,
+      [name, email, hash, avatar]
     );
 
-    res.status(201).json(rows[0]);
+    const user = rows[0];
+
+    // Si es una solicitud de registro (viene del endpoint /register), devolver token también
+    if (req.path === '/register') {
+      console.log('🔐 [REGISTER] Generando token para auto-login...');
+      const token = generateToken(user);
+      res.status(201).json({ user, token });
+    } else {
+      // Creación normal de usuario (endpoint /users)
+      res.status(201).json(user);
+    }
+    
   } catch (error) {
     if (error.code === '23505') {
       return res.status(409).json({ message: "Email ya registrado" });
     }
-    console.error(error);
-    res.status(500).json({ message: "Error interno" });
+    console.error('❌ [CREATE_USER] Error:', error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
@@ -138,6 +150,140 @@ export const loginUser = async (req, res) => {
   } catch (err) {
     console.error("Error al hacer login:", err);
     res.status(500).json({ message: "Error interno" });
+  }
+};
+
+// Nuevo controlador para registro con verificación por email
+export const registerUser = async (req, res) => {
+  try {
+    console.log('📝 [REGISTER] Iniciando proceso de registro...');
+    const { name, email, password, avatar } = req.body;
+
+    // Validaciones
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Todos los campos son requeridos" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres" });
+    }
+
+    // Verificar si el email ya existe
+    const existingUser = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ message: "Email ya registrado" });
+    }
+
+    // Generar código de verificación
+    const verificationCode = generateVerificationCode();
+    console.log('🔢 [REGISTER] Código de verificación generado:', verificationCode);
+
+    // Hashear la contraseña
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Guardar datos temporalmente en tabla de verificaciones
+    const userData = {
+      name,
+      email,
+      password_hash: passwordHash,
+      avatar: avatar || null
+    };
+
+    // Limpiar verificaciones anteriores para este email
+    await pool.query(
+      "DELETE FROM email_verifications WHERE email = $1",
+      [email]
+    );
+
+    // Insertar nueva verificación
+    await pool.query(
+      `INSERT INTO email_verifications (email, verification_code, user_data, expires_at) 
+       VALUES ($1, $2, $3, NOW() + INTERVAL '15 minutes')`,
+      [email, verificationCode, JSON.stringify(userData)]
+    );
+
+    // Enviar email
+    console.log('📧 [REGISTER] Enviando email de verificación...');
+    const emailResult = await sendVerificationEmail(email, verificationCode, name);
+
+    console.log('✅ [REGISTER] Proceso iniciado exitosamente');
+    
+    res.status(200).json({
+      message: "Código de verificación enviado a tu email",
+      email: email,
+      previewUrl: emailResult.previewUrl // Solo para testing
+    });
+
+  } catch (error) {
+    console.error('❌ [REGISTER] Error en registro:', error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Controlador para verificar código y completar registro
+export const verifyEmailAndRegister = async (req, res) => {
+  try {
+    console.log('🔍 [VERIFY] Verificando código...');
+    const { email, verificationCode } = req.body;
+
+    if (!email || !verificationCode) {
+      return res.status(400).json({ message: "Email y código son requeridos" });
+    }
+
+    // Buscar verificación válida
+    const verificationResult = await pool.query(
+      `SELECT * FROM email_verifications 
+       WHERE email = $1 AND verification_code = $2 
+       AND verified = FALSE AND expires_at > NOW()`,
+      [email, verificationCode]
+    );
+
+    if (verificationResult.rows.length === 0) {
+      console.log('❌ [VERIFY] Código inválido o expirado');
+      return res.status(400).json({ message: "Código inválido o expirado" });
+    }
+
+    const verification = verificationResult.rows[0];
+    const userData = verification.user_data;
+
+    console.log('✅ [VERIFY] Código válido, creando usuario...');
+
+    // Crear usuario en la base de datos
+    const { rows } = await pool.query(
+      `INSERT INTO users (name, email, password_hash, avatar, email_verified) 
+       VALUES ($1, $2, $3, $4, TRUE) RETURNING id, name, email, avatar`,
+      [userData.name, userData.email, userData.password_hash, userData.avatar]
+    );
+
+    const user = rows[0];
+
+    // Marcar verificación como completada
+    await pool.query(
+      "UPDATE email_verifications SET verified = TRUE WHERE id = $1",
+      [verification.id]
+    );
+
+    // Generar token para auto-login
+    const token = generateToken(user);
+
+    console.log('🎉 [VERIFY] Usuario creado y verificado exitosamente');
+
+    res.status(201).json({
+      message: "Cuenta creada exitosamente",
+      user,
+      token
+    });
+
+  } catch (error) {
+    if (error.code === '23505') {
+      return res.status(409).json({ message: "Email ya registrado" });
+    }
+    console.error('❌ [VERIFY] Error en verificación:', error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
