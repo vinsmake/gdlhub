@@ -5,7 +5,7 @@ import { TokenStatusBanner } from "../components/TokenStatusBanner";
 export default function RootLayout() {
   return (
     <Screen>
-      <TokenStatusBanner />
+      {/* <TokenStatusBanner /> */}
       <Dashboard>
 
       </Dashboard>
