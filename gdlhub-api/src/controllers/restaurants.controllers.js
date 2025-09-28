@@ -27,9 +27,16 @@ export const getRestaurantById = async (req, res) => {
   const { rid } = req.params;
 
   try {
-    // 1. Restaurante
+    // 1. Restaurante con calificación promedio
     const { rows: restaurantRows } = await pool.query(
-      "SELECT * FROM restaurants WHERE id = $1",
+      `SELECT 
+        r.*,
+        COALESCE(ROUND(AVG(rt.rating), 1), 0) as avg_rating,
+        COUNT(rt.rating) as total_ratings
+      FROM restaurants r
+      LEFT JOIN restaurant_ratings rt ON r.id = rt.restaurant_id
+      WHERE r.id = $1
+      GROUP BY r.id`,
       [rid]
     );
     if (restaurantRows.length === 0) {

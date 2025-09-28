@@ -202,7 +202,24 @@ export default function RestaurantDetail() {
 
   return (
     <div className="bg-neutral-800 p-8 rounded-2xl shadow-xl text-white space-y-6 w-full max-w-7xl mx-auto px-4">
-      <h2 className="text-4xl font-bold">{restaurant.name}</h2>
+      <div className="space-y-3">
+        <h2 className="text-4xl font-bold">{restaurant.name}</h2>
+        
+        {/* Calificación promedio */}
+        {restaurant.avg_rating > 0 ? (
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center">
+              <span className="text-2xl text-yellow-400">⭐</span>
+              <span className="text-xl font-semibold ml-1">{restaurant.avg_rating}</span>
+            </div>
+            <span className="text-gray-400">
+              ({restaurant.total_ratings} {restaurant.total_ratings === 1 ? 'calificación' : 'calificaciones'})
+            </span>
+          </div>
+        ) : (
+          <p className="text-gray-400">Sin calificaciones aún</p>
+        )}
+      </div>
 
       {restaurant.image && (
         <div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
