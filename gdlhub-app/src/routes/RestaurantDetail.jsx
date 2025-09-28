@@ -16,6 +16,8 @@ export default function RestaurantDetail() {
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [userRating, setUserRating] = useState(0);
+  const [showRatingMessage, setShowRatingMessage] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [showCommentLoginMessage, setShowCommentLoginMessage] = useState(false);
 
@@ -47,6 +49,15 @@ export default function RestaurantDetail() {
     })
       .then(res => res.json())
       .then(data => setSaved(data.saved));
+  }, [rid, user, token]);
+
+  useEffect(() => {
+    if (!user || !token) return;
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}/rating`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setUserRating(data.rating || 0));
   }, [rid, user, token]);
 
   useEffect(() => {
@@ -149,6 +160,30 @@ export default function RestaurantDetail() {
     });
   };
 
+  const handleRating = (rating) => {
+    if (!user || !token) {
+      setShowRatingMessage(true);
+      setTimeout(() => setShowRatingMessage(false), 3000);
+      return;
+    }
+
+    fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}/rating`, {
+      method: userRating === rating ? "DELETE" : "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ rating }),
+    }).then(() => {
+      setUserRating(userRating === rating ? 0 : rating);
+      refreshRecommendations(); // Actualizar recomendaciones cuando cambia la calificación
+      // Recargar los datos del restaurante para actualizar el promedio
+      fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
+        .then(res => res.json())
+        .then(setRestaurant);
+    });
+  };
+
   if (!restaurant) return null;
 
   const groupedMenu = {};
@@ -213,7 +248,7 @@ export default function RestaurantDetail() {
         </div>
       )}
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-4">
         <button
           onClick={handleToggleSave}
           className={`px-4 py-2 rounded font-semibold transition ${saved ? "bg-gray-600 hover:bg-gray-500" : "bg-red-600 hover:bg-red-500"
@@ -224,6 +259,32 @@ export default function RestaurantDetail() {
         {showLoginMessage && (
           <p className="text-sm text-red-400">Debes iniciar sesión para guardar restaurantes.</p>
         )}
+
+        {/* Sistema de calificación */}
+        <div className="bg-neutral-800 p-4 rounded-xl">
+          <h4 className="text-lg font-semibold text-white mb-3">Califica este restaurante</h4>
+          <div className="flex items-center space-x-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => handleRating(star)}
+                className={`text-2xl transition-colors ${
+                  star <= userRating ? "text-yellow-400" : "text-gray-500 hover:text-yellow-300"
+                }`}
+              >
+                ⭐
+              </button>
+            ))}
+            {userRating > 0 && (
+              <span className="ml-3 text-sm text-gray-400">
+                Tu calificación: {userRating}/5
+              </span>
+            )}
+          </div>
+          {showRatingMessage && (
+            <p className="text-sm text-red-400 mt-2">Debes iniciar sesión para calificar restaurantes.</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-10 mt-6">

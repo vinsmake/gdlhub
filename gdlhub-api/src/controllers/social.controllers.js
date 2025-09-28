@@ -440,3 +440,68 @@ export const deleteComment = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar comentario" });
   }
 };
+
+// Calificar un restaurante
+export const rateRestaurant = async (req, res) => {
+  const userId = req.user?.id;
+  const { rid } = req.params;
+  const { rating } = req.body;
+
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
+
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Calificación debe ser entre 1 y 5" });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO restaurant_ratings (user_id, restaurant_id, rating) 
+       VALUES ($1, $2, $3) 
+       ON CONFLICT (user_id, restaurant_id) 
+       DO UPDATE SET rating = $3, created_at = CURRENT_TIMESTAMP`,
+      [userId, rid, rating]
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error("Error al calificar restaurante:", err);
+    res.status(500).json({ message: "Error al calificar restaurante" });
+  }
+};
+
+// Quitar calificación de un restaurante
+export const unrateRestaurant = async (req, res) => {
+  const userId = req.user?.id;
+  const { rid } = req.params;
+
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
+
+  try {
+    await pool.query(
+      `DELETE FROM restaurant_ratings WHERE user_id = $1 AND restaurant_id = $2`,
+      [userId, rid]
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error("Error al quitar calificación:", err);
+    res.status(500).json({ message: "Error al quitar calificación" });
+  }
+};
+
+// Obtener la calificación actual del usuario para un restaurante
+export const getUserRating = async (req, res) => {
+  const userId = req.user?.id;
+  const { rid } = req.params;
+
+  if (!userId) return res.status(401).json({ message: "No autenticado" });
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT rating FROM restaurant_ratings WHERE user_id = $1 AND restaurant_id = $2`,
+      [userId, rid]
+    );
+    res.json({ rating: rows[0]?.rating || null });
+  } catch (err) {
+    console.error("Error al obtener calificación:", err);
+    res.status(500).json({ message: "Error interno" });
+  }
+};
