@@ -285,18 +285,35 @@ export default function RestaurantDetail() {
               <button
                 key={star}
                 onClick={() => handleRating(star)}
-                className={`text-2xl transition-colors ${
-                  star <= userRating ? "text-yellow-400" : "text-gray-500 hover:text-yellow-300"
+                className={`text-3xl transition-all duration-200 transform hover:scale-110 ${
+                  star <= userRating 
+                    ? "text-yellow-400 drop-shadow-lg" 
+                    : "text-gray-600 hover:text-gray-400"
                 }`}
+                style={{
+                  filter: star <= userRating ? 'brightness(1.2) contrast(1.1)' : 'brightness(0.7)',
+                  textShadow: star <= userRating ? '0 0 8px rgba(255, 193, 7, 0.6)' : 'none'
+                }}
               >
                 ⭐
               </button>
             ))}
-            {userRating > 0 && (
-              <span className="ml-3 text-sm text-gray-400">
-                Tu calificación: {userRating}/5
-              </span>
-            )}
+            <div className="ml-4 flex flex-col">
+              {userRating > 0 ? (
+                <>
+                  <span className="text-sm font-semibold text-white">
+                    Tu calificación: {userRating}/5
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    Haz clic en la misma estrella para quitar
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-gray-400">
+                  Selecciona las estrellas para calificar
+                </span>
+              )}
+            </div>
           </div>
           {showRatingMessage && (
             <p className="text-sm text-red-400 mt-2">Debes iniciar sesión para calificar restaurantes.</p>
