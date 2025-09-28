@@ -348,25 +348,54 @@ export const updateRestaurant = async (req, res) => {
     let updateParams = [name, description, address, maps];
     
     const restaurantImageFile = req.files?.find(file => file.fieldname === 'image');
+    console.log('🖼️ [RESTAURANT_UPDATE] Imagen de restaurante:', {
+      found: !!restaurantImageFile,
+      fieldname: restaurantImageFile?.fieldname,
+      originalname: restaurantImageFile?.originalname,
+      size: restaurantImageFile?.size
+    });
+    
     if (restaurantImageFile) {
-      const restaurantDir = path.join(process.cwd(), 'uploads', 'restaurants');
-      if (!fs.existsSync(restaurantDir)) {
-        fs.mkdirSync(restaurantDir, { recursive: true });
+      try {
+        const restaurantDir = path.join(process.cwd(), 'uploads', 'restaurants');
+        console.log('📁 [RESTAURANT_UPDATE] Directorio:', restaurantDir);
+        
+        if (!fs.existsSync(restaurantDir)) {
+          fs.mkdirSync(restaurantDir, { recursive: true });
+          console.log('📁 [RESTAURANT_UPDATE] Directorio creado');
+        }
+        
+        const restaurantFilename = `restaurant-${userId}-${Date.now()}${path.extname(restaurantImageFile.originalname)}`;
+        const restaurantFullPath = path.join(restaurantDir, restaurantFilename);
+        const restaurantImagePath = `uploads/restaurants/${restaurantFilename}`;
+        
+        console.log('💾 [RESTAURANT_UPDATE] Guardando imagen:', {
+          filename: restaurantFilename,
+          fullPath: restaurantFullPath,
+          imagePath: restaurantImagePath
+        });
+        
+        fs.writeFileSync(restaurantFullPath, restaurantImageFile.buffer);
+        console.log('✅ [RESTAURANT_UPDATE] Imagen guardada exitosamente');
+        
+        updateQuery += `, image = $5 WHERE id = $6`;
+        updateParams = [...updateParams, restaurantImagePath, rid];
+      } catch (error) {
+        console.error('❌ [RESTAURANT_UPDATE] Error guardando imagen restaurante:', error);
+        throw error;
       }
-      const restaurantFilename = `restaurant-${userId}-${Date.now()}${path.extname(restaurantImageFile.originalname)}`;
-      const restaurantFullPath = path.join(restaurantDir, restaurantFilename);
-      const restaurantImagePath = `uploads/restaurants/${restaurantFilename}`;
-      fs.writeFileSync(restaurantFullPath, restaurantImageFile.buffer);
-      
-      updateQuery += `, image = $5 WHERE id = $6`;
-      updateParams = [...updateParams, restaurantImagePath, rid];
     } else {
       updateQuery += ` WHERE id = $5`;
       updateParams = [...updateParams, rid];
     }
 
     // 1. Actualizar datos básicos del restaurante
+    console.log('🔄 [RESTAURANT_UPDATE] Ejecutando query:', {
+      query: updateQuery,
+      paramsLength: updateParams.length
+    });
     await client.query(updateQuery, updateParams);
+    console.log('✅ [RESTAURANT_UPDATE] Datos básicos actualizados');
 
     // 2. Reemplazar especialidades
     await client.query("DELETE FROM specialties WHERE restaurant_id = $1", [rid]);
