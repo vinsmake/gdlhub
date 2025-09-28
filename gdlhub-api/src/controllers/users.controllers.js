@@ -78,33 +78,114 @@ export const getUserRecommendations = async (req, res) => {
   try {
     const { rows } = await pool.query(
       `
-SELECT 
-  r2.restaurant_id,
-  res.name,
-  res.image,
-  ROUND(AVG(r2.rating), 1) AS avg_rating,
-  COUNT(DISTINCT r_common.user_id) AS similar_votes,
-  ARRAY_AGG(DISTINCT u.name) AS similar_users,
-  MIN(res_common.name) AS common_restaurant,
-  (
-    SELECT COALESCE(json_agg(s.name), '[]')
-    FROM specialties s
-    WHERE s.restaurant_id = res.id
-  ) AS specialties
-FROM restaurant_ratings r1
-JOIN restaurant_ratings r_common ON r1.user_id <> r_common.user_id
-  AND r1.restaurant_id = r_common.restaurant_id
-JOIN restaurant_ratings r2 ON r_common.user_id = r2.user_id
-JOIN restaurants res ON res.id = r2.restaurant_id
-JOIN restaurants res_common ON res_common.id = r_common.restaurant_id
-JOIN users u ON u.id = r_common.user_id
-WHERE r1.user_id = $1
-  AND r2.restaurant_id NOT IN (
-    SELECT restaurant_id FROM restaurant_ratings WHERE user_id = $1
-  )
-GROUP BY r2.restaurant_id, res.id
-ORDER BY avg_rating DESC, similar_votes DESC
-LIMIT 10;
+      WITH user_saved_restaurants AS (
+        SELECT restaurant_id 
+        FROM favorite_restaurants 
+        WHERE user_id = $1
+      ),
+      user_rated_restaurants AS (
+        SELECT restaurant_id 
+        FROM restaurant_ratings 
+        WHERE user_id = $1
+      ),
+      followed_users_favorites AS (
+        -- Restaurantes favoritos de usuarios que sigo
+        SELECT 
+          r.id as restaurant_id,
+          r.name,
+          r.image,
+          COUNT(fr.user_id) as popularity_score,
+          'followed_favorites' as source,
+          ARRAY_AGG(DISTINCT u.name) as recommended_by
+        FROM user_follows uf
+        JOIN favorite_restaurants fr ON uf.followed_id = fr.user_id
+        JOIN restaurants r ON fr.restaurant_id = r.id
+        JOIN users u ON fr.user_id = u.id
+        WHERE uf.follower_id = $1
+          AND r.id NOT IN (SELECT restaurant_id FROM user_saved_restaurants)
+          AND r.id NOT IN (SELECT restaurant_id FROM user_rated_restaurants)
+        GROUP BY r.id, r.name, r.image
+      ),
+      similar_restaurants AS (
+        -- Restaurantes con especialidades similares a mis favoritos
+        SELECT 
+          r.id as restaurant_id,
+          r.name,
+          r.image,
+          COUNT(DISTINCT s.name) as specialty_match_score,
+          'similar_specialties' as source,
+          ARRAY_AGG(DISTINCT s.name) as matched_specialties
+        FROM restaurants r
+        JOIN specialties s ON r.id = s.restaurant_id
+        WHERE s.name IN (
+          SELECT DISTINCT s2.name 
+          FROM user_saved_restaurants usr
+          JOIN specialties s2 ON usr.restaurant_id = s2.restaurant_id
+        )
+        AND r.id NOT IN (SELECT restaurant_id FROM user_saved_restaurants)
+        AND r.id NOT IN (SELECT restaurant_id FROM user_rated_restaurants)
+        GROUP BY r.id, r.name, r.image
+        HAVING COUNT(DISTINCT s.name) >= 1
+      ),
+      top_rated_by_followed AS (
+        -- Restaurantes mejor calificados por usuarios que sigo
+        SELECT 
+          r.id as restaurant_id,
+          r.name,
+          r.image,
+          ROUND(AVG(rt.rating), 1) as avg_rating_by_followed,
+          COUNT(rt.rating) as rating_count,
+          'top_rated_by_followed' as source,
+          ARRAY_AGG(DISTINCT u.name) as rated_by
+        FROM user_follows uf
+        JOIN restaurant_ratings rt ON uf.followed_id = rt.user_id
+        JOIN restaurants r ON rt.restaurant_id = r.id
+        JOIN users u ON rt.user_id = u.id
+        WHERE uf.follower_id = $1
+          AND rt.rating >= 4.0
+          AND r.id NOT IN (SELECT restaurant_id FROM user_saved_restaurants)
+          AND r.id NOT IN (SELECT restaurant_id FROM user_rated_restaurants)
+        GROUP BY r.id, r.name, r.image
+        HAVING AVG(rt.rating) >= 4.0
+      )
+      
+      SELECT 
+        restaurant_id,
+        name,
+        image,
+        source,
+        COALESCE(popularity_score, 0) + 
+        COALESCE(specialty_match_score, 0) * 2 + 
+        COALESCE(ROUND(avg_rating_by_followed * rating_count), 0) as total_score,
+        COALESCE(recommended_by, rated_by, matched_specialties::text[]) as similar_users,
+        COALESCE(avg_rating_by_followed, 0) as avg_rating,
+        (
+          SELECT COALESCE(json_agg(s.name), '[]')
+          FROM specialties s
+          WHERE s.restaurant_id = main.restaurant_id
+        ) as specialties
+      FROM (
+        SELECT restaurant_id, name, image, popularity_score, NULL::integer as specialty_match_score, 
+               NULL::numeric as avg_rating_by_followed, NULL::bigint as rating_count, source, recommended_by, 
+               NULL::text[] as rated_by, NULL::text[] as matched_specialties
+        FROM followed_users_favorites
+        
+        UNION ALL
+        
+        SELECT restaurant_id, name, image, NULL::bigint as popularity_score, specialty_match_score,
+               NULL::numeric as avg_rating_by_followed, NULL::bigint as rating_count, source, 
+               NULL::text[] as recommended_by, NULL::text[] as rated_by, matched_specialties
+        FROM similar_restaurants
+        
+        UNION ALL
+        
+        SELECT restaurant_id, name, image, NULL::bigint as popularity_score, NULL::integer as specialty_match_score,
+               avg_rating_by_followed, rating_count, source, NULL::text[] as recommended_by, 
+               rated_by, NULL::text[] as matched_specialties
+        FROM top_rated_by_followed
+      ) main
+      ORDER BY total_score DESC, source = 'followed_favorites' DESC
+      LIMIT 10;
       `,
       [uid]
     );

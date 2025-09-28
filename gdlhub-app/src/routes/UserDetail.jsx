@@ -6,7 +6,7 @@ import { getAvatarUrl } from "../utils/avatarUtils";
 
 export default function UserDetail() {
   const { uid } = useParams(); // ← para obtener el ID de la URL
-  const { user, token } = useUser();
+  const { user, token, refreshRecommendations } = useUser();
   const navigate = useNavigate();
 
   const [viewedUser, setViewedUser] = useState(null);
@@ -77,7 +77,10 @@ export default function UserDetail() {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    }).then(() => setFollowing(!following));
+    }).then(() => {
+      setFollowing(!following);
+      refreshRecommendations(); // Actualizar recomendaciones cuando cambia el follow status
+    });
   };
 
   if (loading) {

@@ -26,7 +26,7 @@ export default function RestaurantDetail() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 
-  const { user, token } = useUser();
+  const { user, token, refreshRecommendations } = useUser();
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
@@ -143,7 +143,10 @@ export default function RestaurantDetail() {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }).then(() => setSaved(!saved));
+    }).then(() => {
+      setSaved(!saved);
+      refreshRecommendations(); // Actualizar recomendaciones cuando cambia el estado de guardado
+    });
   };
 
   if (!restaurant) return null;

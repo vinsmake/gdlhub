@@ -6,6 +6,7 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [recommendationsUpdateCounter, setRecommendationsUpdateCounter] = useState(0);
 
   useEffect(() => {
     console.log('🔄 [USER_CONTEXT] Inicializando UserContext...');
@@ -126,8 +127,13 @@ export const UserProvider = ({ children }) => {
     console.log('💾 [USER_CONTEXT] Usuario actualizado en localStorage');
   };
 
+  const refreshRecommendations = () => {
+    console.log('🔄 [USER_CONTEXT] Forzando actualización de recomendaciones...');
+    setRecommendationsUpdateCounter(prev => prev + 1);
+  };
+
   return (
-    <UserContext.Provider value={{ user, token, login, logout, updateUser }}>
+    <UserContext.Provider value={{ user, token, login, logout, updateUser, recommendationsUpdateCounter, refreshRecommendations }}>
       {children}
     </UserContext.Provider>
   );

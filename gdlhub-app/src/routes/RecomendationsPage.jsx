@@ -4,7 +4,7 @@ import { useUser } from "../context/UserContext";
 
 export const RecomendationsPage = () => {
   const [recommendations, setRecommendations] = useState([]);
-  const { user } = useUser();
+  const { user, recommendationsUpdateCounter } = useUser();
 
   useEffect(() => {
     if (!user) return;
@@ -12,7 +12,7 @@ export const RecomendationsPage = () => {
       .then((res) => res.json())
       .then(setRecommendations)
       .catch((err) => console.error("Error fetching recommendations:", err));
-  }, [user]);
+  }, [user, recommendationsUpdateCounter]);
 
   return (
     <div className="space-y-6 p-6">
