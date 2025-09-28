@@ -7,11 +7,27 @@ export const getAvatarUrl = (avatar) => {
     return `${baseUrl}/img/user/pc1.jpg`;
   }
   
-  if (avatar.startsWith('/uploads/')) {
+  if (avatar.startsWith('/uploads/') || avatar.startsWith('uploads/')) {
     // Nueva imagen subida por el usuario
-    return `${baseUrl}${avatar}`;
+    return avatar.startsWith('/') ? `${baseUrl}${avatar}` : `${baseUrl}/${avatar}`;
   }
   
   // Imagen estática antigua (pc1.jpg, pc2.jpg, etc.)
   return `${baseUrl}/img/user/${avatar}`;
+};
+
+// Función específica para obtener imagen de perfil
+export const getProfileImageUrl = (user) => {
+  const baseUrl = import.meta.env.VITE_API_BASE;
+  
+  // Prioridad: profile_image > avatar > default
+  if (user?.profile_image) {
+    return user.profile_image.startsWith('/') ? `${baseUrl}${user.profile_image}` : `${baseUrl}/${user.profile_image}`;
+  }
+  
+  if (user?.avatar) {
+    return getAvatarUrl(user.avatar);
+  }
+  
+  return `${baseUrl}/img/user/pc1.jpg`;
 };

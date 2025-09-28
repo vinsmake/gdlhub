@@ -14,6 +14,7 @@ import { SearchPage } from "./routes/SearchPage";
 import CreateUserPage from "./routes/CreateUserPage";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
+import ConfigPage from "./routes/ConfigPage";
 import { HomePage } from "./routes/HomePage";
 
 
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: "/friends", element: <FriendsPage /> },
       { path: "/saved", element: <SavedPage /> },
       { path: "/search", element: <SearchPage /> },
+      { path: "/config", element: <ConfigPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> }
 

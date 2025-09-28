@@ -1,4 +1,6 @@
 import { pool } from "../db.js";
+import path from "path";
+import fs from "fs";
 
 export const getRestaurants = async (req, res) => {
   try {
@@ -122,68 +124,101 @@ export const createRestaurant = async (req, res) => {
   }
 
   try {
-    const { name, description, address, maps, specialties = [], menu = [] } = req.body;
+    let { name, description, address, maps, specialties, menu } = req.body;
+    
+    // Procesar datos JSON si vienen como string
+    if (typeof specialties === 'string') {
+      specialties = JSON.parse(specialties);
+    }
+    if (typeof menu === 'string') {
+      menu = JSON.parse(menu);
+    }
+
+    // Validar que existe el archivo INE
+    const ineFile = req.files?.find(file => file.fieldname === 'ineDocument');
+    if (!ineFile) {
+      return res.status(400).json({ message: "Es obligatorio subir una copia de tu INE" });
+    }
 
     await client.query("BEGIN");
 
-    // 1. Insertar restaurante con user_id
+    // Guardar archivo INE
+    const inePath = `uploads/ine/ine-${userId}-${Date.now()}${path.extname(ineFile.originalname)}`;
+    fs.writeFileSync(inePath, ineFile.buffer);
+
+    // 1. Insertar restaurante con user_id y ruta del INE
     const { rows } = await client.query(
-      'INSERT INTO restaurants (name, description, address, maps, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [name, description, address, maps, userId]
+      'INSERT INTO restaurants (name, description, address, maps, user_id, ine_document) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [name, description, address, maps, userId, inePath]
     );
     const restaurant = rows[0];
 
-    // 2. Insertar especialidades (si hay)
-    for (const spec of specialties) {
-      if (spec.trim()) {
-        await client.query(
-          'INSERT INTO specialties (restaurant_id, name) VALUES ($1, $2)',
-          [restaurant.id, spec.trim()]
-        );
+    // 2. Insertar especialidades
+    if (Array.isArray(specialties)) {
+      for (const spec of specialties) {
+        if (spec && spec.trim()) {
+          await client.query(
+            'INSERT INTO specialties (restaurant_id, name) VALUES ($1, $2)',
+            [restaurant.id, spec.trim()]
+          );
+        }
       }
     }
 
-    // 3. Insertar elementos del menú (si hay)
-    for (const item of menu) {
-      if (item.name.trim()) {
-        const { rows: itemRows } = await client.query(
-          `INSERT INTO menu_items (restaurant_id, name, description, price)
-           VALUES ($1, $2, $3, $4) RETURNING id`,
-          [
-            restaurant.id,
-            item.name.trim(),
-            item.description || "",
-            item.price ? parseFloat(item.price) : null,
-          ]
-        );
-        const menuItemId = itemRows[0].id;
+    // 3. Insertar elementos del menú con imágenes
+    if (Array.isArray(menu)) {
+      for (let i = 0; i < menu.length; i++) {
+        const item = menu[i];
+        if (item.name && item.name.trim()) {
+          // Buscar imagen correspondiente al platillo
+          const dishImageFile = req.files?.find(file => file.fieldname === `menuImage_${i}`);
+          let imagePath = null;
 
-        // Insertar categorías
-        if (Array.isArray(item.category_ids)) {
-          for (const categoryId of item.category_ids) {
-            await client.query(
-              `INSERT INTO menu_item_categories (menu_item_id, category_id)
-               VALUES ($1, $2)`,
-              [menuItemId, categoryId]
-            );
+          if (dishImageFile) {
+            imagePath = `uploads/dishes/dish-${restaurant.id}-${i}-${Date.now()}${path.extname(dishImageFile.originalname)}`;
+            fs.writeFileSync(imagePath, dishImageFile.buffer);
           }
-        }
 
-        // Insertar etiquetas
-        if (Array.isArray(item.tag_ids)) {
-          for (const tagId of item.tag_ids) {
-            await client.query(
-              `INSERT INTO menu_item_tags (menu_item_id, tag_id)
-               VALUES ($1, $2)`,
-              [menuItemId, tagId]
-            );
+          const { rows: itemRows } = await client.query(
+            `INSERT INTO menu_items (restaurant_id, name, description, price, image)
+             VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+            [
+              restaurant.id,
+              item.name.trim(),
+              item.description || "",
+              item.price ? parseFloat(item.price) : null,
+              imagePath
+            ]
+          );
+          const menuItemId = itemRows[0].id;
+
+          // Asociar categorías
+          if (Array.isArray(item.category_ids)) {
+            for (const categoryId of item.category_ids) {
+              await client.query(
+                `INSERT INTO menu_item_categories (menu_item_id, category_id)
+                 VALUES ($1, $2)`,
+                [menuItemId, categoryId]
+              );
+            }
+          }
+
+          // Asociar etiquetas
+          if (Array.isArray(item.tag_ids)) {
+            for (const tagId of item.tag_ids) {
+              await client.query(
+                `INSERT INTO menu_item_tags (menu_item_id, tag_id)
+                 VALUES ($1, $2)`,
+                [menuItemId, tagId]
+              );
+            }
           }
         }
       }
     }
 
     await client.query("COMMIT");
-    res.status(201).json(restaurant);
+    res.status(201).json({ message: "Restaurante creado exitosamente", restaurant });
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Error creating restaurant:", err);

@@ -1,6 +1,6 @@
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-import { getAvatarUrl } from "../../utils/avatarUtils";
+import { getProfileImageUrl } from "../../utils/avatarUtils";
 
 /* Logos */
 import {
@@ -108,9 +108,15 @@ export const DashboardSidebar = () => {
           >
             <Eye size={24} /> Busqueda
           </NavLink>
-          <a href="#" className="flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition">
+
+          <NavLink
+            to="/config"
+            className={({ isActive }) =>
+              `flex items-center gap-2 nav__link rounded-xl px-3 py-2 transition ${isActive ? "nav__link--active" : ""}`
+            }
+          >
             <Settings size={24} /> Configuración
-          </a>
+          </NavLink>
 
           
 
@@ -121,7 +127,7 @@ export const DashboardSidebar = () => {
           {user ? (
             <div className="flex items-center gap-3 p-4 border-t border-neutral-700 mt-4">
               <img
-                src={getAvatarUrl(user.avatar)}
+                src={getProfileImageUrl(user)}
                 alt={user.name}
                 className="w-12 h-12 rounded-full object-cover"
               />

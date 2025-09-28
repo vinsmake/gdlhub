@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import AvatarUpload from "../components/AvatarUpload";
-import { getAvatarUrl } from "../utils/avatarUtils";
+import { getProfileImageUrl } from "../utils/avatarUtils";
 
 export default function UserDetail() {
   const { uid } = useParams(); // ← para obtener el ID de la URL
@@ -16,7 +16,7 @@ export default function UserDetail() {
   const [loading, setLoading] = useState(true);
 
   const handleAvatarUpdate = (newAvatarUrl) => {
-    setViewedUser(prev => prev ? { ...prev, avatar: newAvatarUrl } : null);
+    setViewedUser(prev => prev ? { ...prev, profile_image: newAvatarUrl } : null);
   };
 
   useEffect(() => {
@@ -99,24 +99,34 @@ export default function UserDetail() {
     <div className="text-white space-y-6">
       {/* Información del perfil */}
       <div className="bg-neutral-800 rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">{viewedUser.name}</h2>
-        <p className="text-gray-400 mb-4">Email: {viewedUser.email}</p>
-        
-        {isOwnProfile ? (
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Foto de Perfil</h3>
-            <AvatarUpload 
-              currentUser={viewedUser} 
-              onAvatarUpdate={handleAvatarUpdate}
-            />
+        <div className="flex items-start space-x-6 mb-6">
+          <img
+            src={getProfileImageUrl(viewedUser)}
+            alt={viewedUser.name}
+            className="w-24 h-24 rounded-full object-cover border-2 border-neutral-600"
+          />
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold mb-2">{viewedUser.name}</h2>
+            <p className="text-gray-400 mb-2">📧 {viewedUser.email}</p>
+            
+            {viewedUser.bio && (
+              <p className="text-gray-300 mb-2">💭 {viewedUser.bio}</p>
+            )}
+            
+            {viewedUser.location && (
+              <p className="text-gray-300 mb-2">📍 {viewedUser.location}</p>
+            )}
+
+            <p className="text-sm text-gray-500">
+              Miembro desde {new Date(viewedUser.created_at).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
           </div>
-        ) : (
-          <div className="flex items-center space-x-4">
-            <img
-              src={getAvatarUrl(viewedUser.avatar)}
-              alt={viewedUser.name}
-              className="w-16 h-16 rounded-full object-cover"
-            />
+          
+          {!isOwnProfile && (
             <button
               onClick={handleClick}
               className={`px-4 py-2 rounded font-semibold transition ${
@@ -127,6 +137,24 @@ export default function UserDetail() {
             >
               {following ? "Dejar de seguir" : "Seguir"}
             </button>
+          )}
+        </div>
+        
+        {isOwnProfile && (
+          <div className="border-t border-neutral-700 pt-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold">Gestión de Perfil</h3>
+              <button
+                onClick={() => navigate('/config')}
+                className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-medium transition"
+              >
+                ⚙️ Editar Perfil
+              </button>
+            </div>
+            <AvatarUpload 
+              currentUser={viewedUser} 
+              onAvatarUpdate={handleAvatarUpdate}
+            />
           </div>
         )}
       </div>
@@ -180,7 +208,7 @@ export default function UserDetail() {
               >
                 <div className="flex items-center space-x-3">
                   <img
-                    src={getAvatarUrl(followedUser.avatar)}
+                    src={getProfileImageUrl(followedUser)}
                     alt={followedUser.name}
                     className="w-12 h-12 rounded-full object-cover"
                   />

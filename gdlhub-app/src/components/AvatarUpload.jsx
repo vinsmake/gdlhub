@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
-import { getAvatarUrl } from "../utils/avatarUtils";
+import { getProfileImageUrl } from "../utils/avatarUtils";
 
 export default function AvatarUpload({ currentUser, onAvatarUpdate }) {
   const [isUploading, setIsUploading] = useState(false);
@@ -53,7 +53,7 @@ export default function AvatarUpload({ currentUser, onAvatarUpdate }) {
       
       // Actualizar el contexto del usuario con la nueva foto
       if (updateUser) {
-        updateUser({ ...currentUser, avatar: data.avatarUrl });
+        updateUser({ ...currentUser, profile_image: data.avatarUrl });
       }
       
       // Notificar al componente padre
@@ -77,7 +77,7 @@ export default function AvatarUpload({ currentUser, onAvatarUpdate }) {
       <div className="flex items-center space-x-4">
         <div className="relative">
           <img
-            src={getAvatarUrl(currentUser.avatar)}
+            src={getProfileImageUrl(currentUser)}
             alt={currentUser.name}
             className="w-20 h-20 rounded-full object-cover border-2 border-gray-600"
           />

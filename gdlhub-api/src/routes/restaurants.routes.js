@@ -10,6 +10,7 @@ import {
   getMenuMeta,
 } from "../controllers/restaurants.controllers.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
+import { uploadRestaurantFiles } from "../middleware/uploadMiddleware.js";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get("/restaurants/by-specialty", getRestaurantsBySpecialties);
 
 router.get("/restaurants", getRestaurants);
 router.get("/restaurants/:rid", getRestaurantById);
-router.post("/restaurants", verifyToken, createRestaurant);
+router.post("/restaurants", verifyToken, uploadRestaurantFiles.any(), createRestaurant);
 router.put("/restaurants/:rid", verifyToken, updateRestaurant);
 router.delete("/restaurants/:rid", verifyToken, deleteRestaurant);
 router.get("/menu/meta", getMenuMeta);

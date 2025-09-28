@@ -397,9 +397,9 @@ export const uploadUserAvatar = async (req, res) => {
 
     const avatarPath = `/uploads/avatars/${req.file.filename}`;
     
-    // Actualizar la base de datos con la ruta del avatar
+    // Actualizar la base de datos con la ruta del avatar en el campo profile_image
     const { rows } = await pool.query(
-      'UPDATE users SET avatar = $1 WHERE id = $2 RETURNING id, name, email, avatar',
+      'UPDATE users SET profile_image = $1 WHERE id = $2 RETURNING id, name, email, avatar, profile_image',
       [avatarPath, userId]
     );
 
@@ -416,7 +416,8 @@ export const uploadUserAvatar = async (req, res) => {
       success: true,
       message: "Avatar subido exitosamente",
       user: rows[0],
-      avatarUrl: avatarPath
+      avatarUrl: avatarPath,
+      profileImage: avatarPath
     });
 
   } catch (error) {
@@ -476,6 +477,86 @@ export const getUserFollowing = async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error('❌ [USER_FOLLOWING] Error:', error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Actualizar perfil de usuario
+export const updateProfile = async (req, res) => {
+  const userId = req.user?.id;
+  
+  if (!userId) {
+    return res.status(401).json({ message: "No autenticado" });
+  }
+
+  try {
+    console.log('📝 [UPDATE_PROFILE] Body:', req.body);
+    console.log('📁 [UPDATE_PROFILE] File:', req.file);
+    
+    const { name, email, bio, location } = req.body;
+    let profileImagePath = null;
+
+    // Procesar imagen de perfil si se subió
+    if (req.file) {
+      profileImagePath = `uploads/profiles/${req.file.filename}`;
+    }
+
+    // Construir query dinámicamente
+    const updates = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (name) {
+      updates.push(`name = $${paramCount++}`);
+      values.push(name);
+    }
+    if (email) {
+      updates.push(`email = $${paramCount++}`);
+      values.push(email);
+    }
+    if (bio !== undefined) {
+      updates.push(`bio = $${paramCount++}`);
+      values.push(bio);
+    }
+    if (location !== undefined) {
+      updates.push(`location = $${paramCount++}`);
+      values.push(location);
+    }
+    if (profileImagePath) {
+      updates.push(`profile_image = $${paramCount++}`);
+      values.push(profileImagePath);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: "No hay campos para actualizar" });
+    }
+
+    values.push(userId);
+    const query = `
+      UPDATE users 
+      SET ${updates.join(', ')} 
+      WHERE id = $${paramCount} 
+      RETURNING id, name, email, bio, location, profile_image, avatar, created_at
+    `;
+
+    const { rows } = await pool.query(query, values);
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json({ 
+      message: "Perfil actualizado correctamente",
+      user: rows[0]
+    });
+
+  } catch (error) {
+    console.error('❌ [UPDATE_PROFILE] Error:', error);
+    
+    if (error.code === '23505') {
+      return res.status(409).json({ message: "Email ya está en uso" });
+    }
+    
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
