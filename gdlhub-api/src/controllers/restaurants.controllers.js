@@ -313,7 +313,6 @@ export const updateRestaurant = async (req, res) => {
   const client = await pool.connect();
   try {
     console.log('🔄 [RESTAURANT_UPDATE] Iniciando actualización de restaurante:', rid);
-    console.log('🔄 [RESTAURANT_UPDATE] req.body:', req.body);
     console.log('🔄 [RESTAURANT_UPDATE] Archivos recibidos:', req.files?.length || 0);
     
     if (!req.body) {
