@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { fetchAuth } from "../utils/fetchAuth";
 import { getProfileImageUrl } from "../utils/avatarUtils";
+import { getRestaurantImageUrl } from "../utils/imageUtils";
 
 export const HomePage = () => {
   const { user } = useUser();
@@ -123,9 +124,13 @@ export const HomePage = () => {
               {r.image && (
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
                   <img
-                    src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
+                    src={getRestaurantImageUrl(r.image)}
                     alt={r.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.log('❌ Error cargando imagen en HomePage:', r.image);
+                      e.target.style.display = 'none';
+                    }}
                   />
                 </div>
               )}

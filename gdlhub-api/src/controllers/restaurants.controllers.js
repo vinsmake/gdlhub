@@ -126,6 +126,10 @@ export const createRestaurant = async (req, res) => {
   try {
     let { name, description, address, maps, specialties, menu } = req.body;
     
+    console.log('🍽️ [RESTAURANT] Iniciando creación de restaurante:', name);
+    console.log('🍽️ [RESTAURANT] Archivos recibidos:', req.files?.length || 0);
+    console.log('🍽️ [RESTAURANT] Fieldnames de archivos:', req.files?.map(f => f.fieldname) || []);
+    
     // Procesar datos JSON si vienen como string
     if (typeof specialties === 'string') {
       specialties = JSON.parse(specialties);
@@ -143,13 +147,40 @@ export const createRestaurant = async (req, res) => {
     await client.query("BEGIN");
 
     // Guardar archivo INE
-    const inePath = `uploads/ine/ine-${userId}-${Date.now()}${path.extname(ineFile.originalname)}`;
-    fs.writeFileSync(inePath, ineFile.buffer);
+    const ineDir = path.join(process.cwd(), 'uploads', 'ine');
+    if (!fs.existsSync(ineDir)) {
+      fs.mkdirSync(ineDir, { recursive: true });
+    }
+    const ineFilename = `ine-${userId}-${Date.now()}${path.extname(ineFile.originalname)}`;
+    const ineFullPath = path.join(ineDir, ineFilename);
+    const inePath = `uploads/ine/${ineFilename}`;
+    fs.writeFileSync(ineFullPath, ineFile.buffer);
 
-    // 1. Insertar restaurante con user_id y ruta del INE
+    // Manejar imagen principal del restaurante
+    const restaurantImageFile = req.files?.find(file => file.fieldname === 'image');
+    let restaurantImagePath = null;
+
+    console.log('📸 [RESTAURANT] Buscando imagen del restaurante...');
+    if (restaurantImageFile) {
+      console.log('📸 [RESTAURANT] Imagen encontrada:', restaurantImageFile.originalname);
+      const restaurantDir = path.join(process.cwd(), 'uploads', 'restaurants');
+      if (!fs.existsSync(restaurantDir)) {
+        fs.mkdirSync(restaurantDir, { recursive: true });
+        console.log('📁 [RESTAURANT] Directorio creado:', restaurantDir);
+      }
+      const restaurantFilename = `restaurant-${userId}-${Date.now()}${path.extname(restaurantImageFile.originalname)}`;
+      const restaurantFullPath = path.join(restaurantDir, restaurantFilename);
+      restaurantImagePath = `uploads/restaurants/${restaurantFilename}`;
+      fs.writeFileSync(restaurantFullPath, restaurantImageFile.buffer);
+      console.log('✅ [RESTAURANT] Imagen guardada en:', restaurantImagePath);
+    } else {
+      console.log('❌ [RESTAURANT] No se encontró imagen del restaurante');
+    }
+
+    // 1. Insertar restaurante con user_id, ruta del INE e imagen
     const { rows } = await client.query(
-      'INSERT INTO restaurants (name, description, address, maps, user_id, ine_document) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [name, description, address, maps, userId, inePath]
+      'INSERT INTO restaurants (name, description, address, maps, user_id, ine_document, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [name, description, address, maps, userId, inePath, restaurantImagePath]
     );
     const restaurant = rows[0];
 
@@ -175,8 +206,15 @@ export const createRestaurant = async (req, res) => {
           let imagePath = null;
 
           if (dishImageFile) {
-            imagePath = `uploads/dishes/dish-${restaurant.id}-${i}-${Date.now()}${path.extname(dishImageFile.originalname)}`;
-            fs.writeFileSync(imagePath, dishImageFile.buffer);
+            // Crear directorio si no existe
+            const dishesDir = path.join(process.cwd(), 'uploads', 'dishes');
+            if (!fs.existsSync(dishesDir)) {
+              fs.mkdirSync(dishesDir, { recursive: true });
+            }
+            const filename = `dish-${restaurant.id}-${i}-${Date.now()}${path.extname(dishImageFile.originalname)}`;
+            const fullPath = path.join(dishesDir, filename);
+            imagePath = `uploads/dishes/${filename}`;
+            fs.writeFileSync(fullPath, dishImageFile.buffer);
           }
 
           const { rows: itemRows } = await client.query(
@@ -266,7 +304,6 @@ export const deleteRestaurant = async (req, res) => {
 export const updateRestaurant = async (req, res) => {
   const { rid } = req.params;
   const userId = req.user?.id;
-  const { name, description, address, maps, specialties = [], menu = [] } = req.body;
 
   if (!userId) {
     return res.status(401).json({ message: "No autenticado" });
@@ -274,6 +311,19 @@ export const updateRestaurant = async (req, res) => {
 
   const client = await pool.connect();
   try {
+    let { name, description, address, maps, specialties, menu } = req.body;
+    
+    console.log('🔄 [RESTAURANT_UPDATE] Iniciando actualización de restaurante:', rid);
+    console.log('🔄 [RESTAURANT_UPDATE] Archivos recibidos:', req.files?.length || 0);
+    
+    // Procesar datos JSON si vienen como string
+    if (typeof specialties === 'string') {
+      specialties = JSON.parse(specialties);
+    }
+    if (typeof menu === 'string') {
+      menu = JSON.parse(menu);
+    }
+    
     // Verificar propiedad del restaurante
     const { rows } = await client.query(
       "SELECT user_id FROM restaurants WHERE id = $1",
@@ -288,13 +338,30 @@ export const updateRestaurant = async (req, res) => {
 
     await client.query("BEGIN");
 
-    // 1. Actualizar datos básicos
-    await client.query(
-      `UPDATE restaurants
-       SET name = $1, description = $2, address = $3, maps = $4
-       WHERE id = $5`,
-      [name, description, address, maps, rid]
-    );
+    // Manejar nueva imagen del restaurante si se proporciona
+    let updateQuery = `UPDATE restaurants SET name = $1, description = $2, address = $3, maps = $4`;
+    let updateParams = [name, description, address, maps];
+    
+    const restaurantImageFile = req.files?.find(file => file.fieldname === 'image');
+    if (restaurantImageFile) {
+      const restaurantDir = path.join(process.cwd(), 'uploads', 'restaurants');
+      if (!fs.existsSync(restaurantDir)) {
+        fs.mkdirSync(restaurantDir, { recursive: true });
+      }
+      const restaurantFilename = `restaurant-${userId}-${Date.now()}${path.extname(restaurantImageFile.originalname)}`;
+      const restaurantFullPath = path.join(restaurantDir, restaurantFilename);
+      const restaurantImagePath = `uploads/restaurants/${restaurantFilename}`;
+      fs.writeFileSync(restaurantFullPath, restaurantImageFile.buffer);
+      
+      updateQuery += `, image = $5 WHERE id = $6`;
+      updateParams = [...updateParams, restaurantImagePath, rid];
+    } else {
+      updateQuery += ` WHERE id = $5`;
+      updateParams = [...updateParams, rid];
+    }
+
+    // 1. Actualizar datos básicos del restaurante
+    await client.query(updateQuery, updateParams);
 
     // 2. Reemplazar especialidades
     await client.query("DELETE FROM specialties WHERE restaurant_id = $1", [rid]);
@@ -321,17 +388,36 @@ export const updateRestaurant = async (req, res) => {
 
     await client.query("DELETE FROM menu_items WHERE restaurant_id = $1", [rid]);
 
-    // 4. Insertar nuevo menú
-    for (const item of menu) {
+    // 4. Insertar nuevo menú con imágenes
+    for (let i = 0; i < menu.length; i++) {
+      const item = menu[i];
       if (item.name.trim()) {
+        // Buscar imagen nueva para este platillo
+        const dishImageFile = req.files?.find(file => file.fieldname === `menuImage_${i}`);
+        let imagePath = item.image; // Mantener imagen existente por defecto
+
+        if (dishImageFile) {
+          // Crear directorio si no existe
+          const dishesDir = path.join(process.cwd(), 'uploads', 'dishes');
+          if (!fs.existsSync(dishesDir)) {
+            fs.mkdirSync(dishesDir, { recursive: true });
+          }
+          const filename = `dish-${rid}-${i}-${Date.now()}${path.extname(dishImageFile.originalname)}`;
+          const fullPath = path.join(dishesDir, filename);
+          imagePath = `uploads/dishes/${filename}`;
+          fs.writeFileSync(fullPath, dishImageFile.buffer);
+          console.log(`🍽️ [RESTAURANT_UPDATE] Nueva imagen de platillo ${i}:`, imagePath);
+        }
+        
         const { rows: itemRows } = await client.query(
-          `INSERT INTO menu_items (restaurant_id, name, description, price)
-           VALUES ($1, $2, $3, $4) RETURNING id`,
+          `INSERT INTO menu_items (restaurant_id, name, description, price, image)
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
           [
             rid,
             item.name.trim(),
             item.description || "",
             item.price ? parseFloat(item.price) : null,
+            imagePath
           ]
         );
         const menuItemId = itemRows[0].id;

@@ -4,6 +4,7 @@ import { toPng } from "html-to-image";
 import { useRef, useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { getAvatarUrl } from "../utils/avatarUtils";
+import { getRestaurantImageUrl, getDishImageUrl } from "../utils/imageUtils";
 
 export default function RestaurantDetail() {
   const { rid } = useParams();
@@ -224,9 +225,13 @@ export default function RestaurantDetail() {
       {restaurant.image && (
         <div className="w-48 h-48 mx-auto mt-4 rounded-full overflow-hidden shadow-md bg-neutral-700">
           <img
-            src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${restaurant.image}`}
+            src={getRestaurantImageUrl(restaurant.image)}
             alt={restaurant.name}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.log('❌ Error cargando imagen de restaurante:', restaurant.image);
+              e.target.style.display = 'none';
+            }}
           />
         </div>
       )}
@@ -333,9 +338,14 @@ export default function RestaurantDetail() {
                     <div className="flex-shrink-0">
                       {item.image ? (
                         <img
-                          src={`${import.meta.env.VITE_API_BASE}/${item.image}`}
+                          src={getDishImageUrl(item.image)}
                           alt={item.name}
                           className="w-24 h-24 object-cover rounded-lg border border-neutral-600"
+                          onError={(e) => {
+                            console.log('❌ Error cargando imagen de platillo:', item.image);
+                            e.target.style.display = 'none';
+                            e.target.parentNode.innerHTML = '<div class="w-24 h-24 bg-neutral-600 rounded-lg border border-neutral-500 flex items-center justify-center"><span class="text-gray-400 text-2xl">🍽️</span></div>';
+                          }}
                         />
                       ) : (
                         <div className="w-24 h-24 bg-neutral-600 rounded-lg border border-neutral-500 flex items-center justify-center">

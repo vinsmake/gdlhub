@@ -42,6 +42,8 @@ export default function RestaurantPost() {
   // Estados para INE y validación
   const [ineFile, setIneFile] = useState(null);
   const [inePreview, setInePreview] = useState(null);
+  const [restaurantImage, setRestaurantImage] = useState(null);
+  const [restaurantImagePreview, setRestaurantImagePreview] = useState(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,27 @@ export default function RestaurantPost() {
       const reader = new FileReader();
       reader.onload = (e) => {
         setInePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRestaurantImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar tamaño de archivo (máximo 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        setError(`La imagen del restaurante es demasiado grande. Máximo 5MB.`);
+        return;
+      }
+      
+      setRestaurantImage(file);
+      
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setRestaurantImagePreview(e.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -125,7 +148,10 @@ export default function RestaurantPost() {
       formData.append("address", form.address);
       formData.append("maps", form.maps);
       
-
+      // Imagen del restaurante
+      if (restaurantImage) {
+        formData.append("image", restaurantImage);
+      }
       
       // Especialidades
       const validSpecialties = specialties.filter((s) => s.trim() !== "");
@@ -215,6 +241,22 @@ export default function RestaurantPost() {
           <input name="name" placeholder="Nombre del restaurante" value={form.name} onChange={handleChange} className="w-full p-3 rounded bg-neutral-700 border border-neutral-600 focus:border-red-500 focus:outline-none" required />
           <textarea name="description" placeholder="Descripción del restaurante" value={form.description} onChange={handleChange} className="w-full p-3 rounded bg-neutral-700 border border-neutral-600 focus:border-red-500 focus:outline-none h-24 resize-none" required />
           <input name="address" placeholder="Dirección completa" value={form.address} onChange={handleChange} className="w-full p-3 rounded bg-neutral-700 border border-neutral-600 focus:border-red-500 focus:outline-none" required />
+
+          {/* Imagen del restaurante */}
+          <div>
+            <label className="block text-sm font-medium mb-2">📸 Imagen del restaurante (recomendado)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleRestaurantImageChange}
+              className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-500"
+            />
+            {restaurantImagePreview && (
+              <div className="mt-2">
+                <img src={restaurantImagePreview} alt="Preview restaurante" className="w-32 h-32 object-cover rounded border" />
+              </div>
+            )}
+          </div>
 
           <input name="maps" placeholder="URL de Google Maps (opcional)" value={form.maps} onChange={handleChange} className="w-full p-3 rounded bg-neutral-700 border border-neutral-600 focus:border-red-500 focus:outline-none" />
         </div>

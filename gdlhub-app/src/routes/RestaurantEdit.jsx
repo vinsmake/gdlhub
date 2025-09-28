@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
+import { getRestaurantImageUrl, getDishImageUrl } from "../utils/imageUtils";
 
 export default function RestaurantEdit() {
   const { rid } = useParams();
@@ -9,6 +10,8 @@ export default function RestaurantEdit() {
 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const [newRestaurantImage, setNewRestaurantImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`)
@@ -61,19 +64,37 @@ export default function RestaurantEdit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
+      const formData = new FormData();
+      
+      // Datos básicos
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("address", form.address);
+      formData.append("maps", form.maps);
+      formData.append("specialties", JSON.stringify(specialties.filter((s) => s.trim() !== "")));
+      formData.append("menu", JSON.stringify(menuItems.filter((m) => m.name.trim() !== "")));
+      
+      // Imagen de restaurante
+      if (newRestaurantImage) {
+        formData.append("image", newRestaurantImage);
+      }
+      
+      // Imágenes de platillos
+      menuItems.forEach((item, index) => {
+        if (item.newImage) {
+          formData.append(`menuImage_${index}`, item.newImage);
+        }
+      });
+
       const res = await fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...form,
-          specialties: specialties.filter((s) => s.trim() !== ""),
-          menu: menuItems.filter((m) => m.name.trim() !== ""),
-        }),
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Error al actualizar restaurante");
@@ -81,6 +102,8 @@ export default function RestaurantEdit() {
       navigate(`/restaurants/${rid}`);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,6 +117,30 @@ export default function RestaurantEdit() {
         <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" required />
         <input name="address" placeholder="Dirección" value={form.address} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" required />
         <input name="maps" placeholder="Embed URL de Google Maps" value={form.maps} onChange={handleChange} className="w-full p-2 rounded bg-neutral-700" />
+
+        {/* Imagen del restaurante */}
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Imagen del restaurante</h2>
+          {data.image && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-400 mb-2">Imagen actual:</p>
+              <img
+                src={getRestaurantImageUrl(data.image)}
+                alt="Imagen actual"
+                className="w-32 h-32 object-cover rounded-lg border border-neutral-600"
+              />
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setNewRestaurantImage(e.target.files[0])}
+            className="w-full p-2 rounded bg-neutral-700 border border-neutral-600 focus:border-red-500 focus:outline-none"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Selecciona una nueva imagen para reemplazar la actual (opcional)
+          </p>
+        </div>
 
         <div>
           <h2 className="text-xl font-semibold mt-4 mb-2">Especialidades</h2>
@@ -194,6 +241,34 @@ export default function RestaurantEdit() {
                   </label>
                 ))}
               </div>
+
+              {/* Imagen del platillo */}
+              <div className="mt-4">
+                <label className="text-sm font-semibold block text-white mb-2">Imagen del platillo:</label>
+                {item.image && (
+                  <div className="mb-2">
+                    <p className="text-xs text-gray-400 mb-1">Imagen actual:</p>
+                    <img
+                      src={getDishImageUrl(item.image)}
+                      alt={item.name || 'Platillo'}
+                      className="w-20 h-20 object-cover rounded border border-neutral-600"
+                    />
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const copy = [...menuItems];
+                    copy[index].newImage = e.target.files[0];
+                    setMenuItems(copy);
+                  }}
+                  className="w-full p-2 rounded bg-neutral-700 border border-neutral-600 focus:border-red-500 focus:outline-none text-sm"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Selecciona una nueva imagen para reemplazar la actual (opcional)
+                </p>
+              </div>
             </div>
           ))}
           {menuItems.length < 100 ? (
@@ -216,8 +291,12 @@ export default function RestaurantEdit() {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <button type="submit" className="bg-red-600 hover:bg-red-500 px-6 py-2 rounded text-white font-semibold transition">
-          Guardar cambios
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="bg-red-600 hover:bg-red-500 disabled:bg-red-700 disabled:opacity-50 px-6 py-2 rounded text-white font-semibold transition"
+        >
+          {loading ? "Guardando..." : "Guardar cambios"}
         </button>
       </form>
     </div>

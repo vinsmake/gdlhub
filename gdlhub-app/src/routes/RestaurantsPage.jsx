@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getRestaurantImageUrl } from "../utils/imageUtils";
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState([]);
@@ -27,9 +28,13 @@ export default function RestaurantsPage() {
               {r.image && (
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-600">
                   <img
-                    src={`${import.meta.env.VITE_API_BASE}/img/restaurant/${r.image}`}
+                    src={getRestaurantImageUrl(r.image)}
                     alt={r.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.log('❌ Error cargando imagen de restaurante:', r.image);
+                      e.target.style.display = 'none';
+                    }}
                   />
                 </div>
               )}
