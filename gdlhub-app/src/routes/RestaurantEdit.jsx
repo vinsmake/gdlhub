@@ -78,16 +78,36 @@ export default function RestaurantEdit() {
       formData.append("menu", JSON.stringify(menuItems.filter((m) => m.name.trim() !== "")));
       
       // Imagen de restaurante
+      console.log('🖼️ [EDIT] Nueva imagen de restaurante:', {
+        hasImage: !!newRestaurantImage,
+        fileName: newRestaurantImage?.name,
+        fileSize: newRestaurantImage?.size,
+        fileType: newRestaurantImage?.type
+      });
+      
       if (newRestaurantImage) {
         formData.append("image", newRestaurantImage);
       }
       
       // Imágenes de platillos
+      console.log('🍽️ [EDIT] Procesando imágenes de platillos...');
       menuItems.forEach((item, index) => {
         if (item.newImage) {
+          console.log(`🍽️ [EDIT] Imagen platillo ${index}:`, {
+            name: item.name,
+            fileName: item.newImage?.name,
+            fileSize: item.newImage?.size
+          });
           formData.append(`menuImage_${index}`, item.newImage);
         }
       });
+
+      console.log('📤 [EDIT] Enviando request a:', `${import.meta.env.VITE_API_BASE}/restaurants/${rid}`);
+      console.log('📤 [EDIT] FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({
+        key,
+        isFile: value instanceof File,
+        fileName: value instanceof File ? value.name : typeof value
+      })));
 
       const res = await fetch(`${import.meta.env.VITE_API_BASE}/restaurants/${rid}`, {
         method: "PUT",
@@ -97,10 +117,21 @@ export default function RestaurantEdit() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Error al actualizar restaurante");
+      console.log('📥 [EDIT] Response status:', res.status, res.statusText);
+      console.log('📥 [EDIT] Response headers:', Object.fromEntries(res.headers.entries()));
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('❌ [EDIT] Error response body:', errorText);
+        throw new Error(`Error ${res.status}: ${errorText}`);
+      }
+
+      const responseData = await res.json();
+      console.log('✅ [EDIT] Success response:', responseData);
 
       navigate(`/restaurants/${rid}`);
     } catch (err) {
+      console.error('❌ [EDIT] Caught error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
