@@ -60,6 +60,7 @@ SELECT
   mi.name,
   mi.description,
   mi.price,
+  mi.image,
   COALESCE(
     json_agg(DISTINCT mc.name) FILTER (WHERE mc.name IS NOT NULL),
     '[]'
@@ -82,7 +83,7 @@ LEFT JOIN menu_categories mc ON mc.id = mic.category_id
 LEFT JOIN menu_item_tags mit ON mit.menu_item_id = mi.id
 LEFT JOIN menu_tags mt ON mt.id = mit.tag_id
 WHERE mi.restaurant_id = $1
-GROUP BY mi.id
+GROUP BY mi.id, mi.name, mi.description, mi.price, mi.image
 ORDER BY mi.name
 
       `,
@@ -311,10 +312,15 @@ export const updateRestaurant = async (req, res) => {
 
   const client = await pool.connect();
   try {
-    let { name, description, address, maps, specialties, menu } = req.body;
-    
     console.log('🔄 [RESTAURANT_UPDATE] Iniciando actualización de restaurante:', rid);
+    console.log('🔄 [RESTAURANT_UPDATE] req.body:', req.body);
     console.log('🔄 [RESTAURANT_UPDATE] Archivos recibidos:', req.files?.length || 0);
+    
+    if (!req.body) {
+      return res.status(400).json({ message: "No se recibieron datos para actualizar" });
+    }
+    
+    let { name, description, address, maps, specialties, menu } = req.body;
     
     // Procesar datos JSON si vienen como string
     if (typeof specialties === 'string') {

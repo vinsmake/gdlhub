@@ -21,7 +21,7 @@ router.get("/restaurants/by-specialty", getRestaurantsBySpecialties);
 router.get("/restaurants", getRestaurants);
 router.get("/restaurants/:rid", getRestaurantById);
 router.post("/restaurants", verifyToken, uploadRestaurantFiles.any(), createRestaurant);
-router.put("/restaurants/:rid", verifyToken, updateRestaurant);
+router.put("/restaurants/:rid", verifyToken, uploadRestaurantFiles.any(), updateRestaurant);
 router.delete("/restaurants/:rid", verifyToken, deleteRestaurant);
 router.get("/menu/meta", getMenuMeta);
 

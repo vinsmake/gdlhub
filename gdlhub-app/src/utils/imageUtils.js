@@ -23,11 +23,11 @@ export const getDishImageUrl = (image) => {
     return null;
   }
   
+  // Si ya incluye uploads/ (nueva imagen), usar directamente
   if (image.startsWith('/uploads/') || image.startsWith('uploads/')) {
-    // Nueva imagen subida por el usuario
     return image.startsWith('/') ? `${baseUrl}${image}` : `${baseUrl}/${image}`;
   }
   
-  // Para backwards compatibility, si no tiene prefijo uploads
-  return `${baseUrl}/uploads/dishes/${image}`;
+  // Para backwards compatibility con imágenes legacy
+  return `${baseUrl}/img/dishes/${image}`;
 };
