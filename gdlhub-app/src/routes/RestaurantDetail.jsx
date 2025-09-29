@@ -330,7 +330,7 @@ export default function RestaurantDetail() {
         {Object.entries(groupedMenu).map(([category, items]) => (
           <div key={category}>
             <h3 className="text-2xl font-semibold text-white mb-4">{category}</h3>
-            <div className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
               {items.map((item) => (
                 <div key={item.id} className="bg-neutral-700 p-3 sm:p-4 rounded-lg sm:rounded-xl">
                   <div className="flex gap-2 sm:gap-4">
