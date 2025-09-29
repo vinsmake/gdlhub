@@ -330,53 +330,56 @@ export default function RestaurantDetail() {
         {Object.entries(groupedMenu).map(([category, items]) => (
           <div key={category}>
             <h3 className="text-2xl font-semibold text-white mb-4">{category}</h3>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="bg-neutral-700 p-4 rounded-xl">
-                  <div className="flex gap-4">
+                <div key={item.id} className="bg-neutral-700 p-3 sm:p-4 rounded-lg sm:rounded-xl">
+                  <div className="flex gap-2 sm:gap-4">
                     {/* Imagen del platillo a la izquierda */}
                     <div className="flex-shrink-0">
                       {item.image ? (
                         <img
                           src={getDishImageUrl(item.image)}
                           alt={item.name}
-                          className="w-24 h-24 object-cover rounded-lg border border-neutral-600"
+                          className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover rounded-lg border border-neutral-600"
                           onError={(e) => {
                             console.log('❌ Error cargando imagen de platillo:', item.image);
                             e.target.style.display = 'none';
-                            e.target.parentNode.innerHTML = '<div class="w-24 h-24 bg-neutral-600 rounded-lg border border-neutral-500 flex items-center justify-center"><span class="text-gray-400 text-2xl">🍽️</span></div>';
+                            e.target.parentNode.innerHTML = '<div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-neutral-600 rounded-lg border border-neutral-500 flex items-center justify-center"><span class="text-gray-400 text-xl sm:text-2xl">🍽️</span></div>';
                           }}
                         />
                       ) : (
-                        <div className="w-24 h-24 bg-neutral-600 rounded-lg border border-neutral-500 flex items-center justify-center">
-                          <span className="text-gray-400 text-2xl">🍽️</span>
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-neutral-600 rounded-lg border border-neutral-500 flex items-center justify-center">
+                          <span className="text-gray-400 text-xl sm:text-2xl">🍽️</span>
                         </div>
                       )}
                     </div>
 
                     {/* Información del platillo a la derecha */}
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-1 sm:space-y-2 min-w-0">
                       <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-white text-lg">{item.name}</h4>
-                        <span className="text-lg font-semibold text-green-400 ml-4">
+                        <h4 className="font-medium text-white text-sm sm:text-base lg:text-lg truncate">{item.name}</h4>
+                        <span className="text-sm sm:text-base lg:text-lg font-semibold text-green-400 ml-2 flex-shrink-0">
                           ${parseFloat(item.price).toFixed(2)}
                         </span>
                       </div>
                       
                       {item.description && (
-                        <p className="text-gray-300 text-sm leading-relaxed">{item.description}</p>
+                        <p className="text-gray-300 text-xs sm:text-sm leading-relaxed line-clamp-2">{item.description}</p>
                       )}
                       
                       {Array.isArray(item.tags) && item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {item.tags.map((tag, idx) => (
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                          {item.tags.slice(0, 3).map((tag, idx) => (
                             <span
                               key={idx}
-                              className="text-xs bg-red-600/20 border border-red-500 text-red-300 px-2 py-1 rounded-full"
+                              className="text-xs bg-red-600/20 border border-red-500 text-red-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full"
                             >
                               {tag}
                             </span>
                           ))}
+                          {item.tags.length > 3 && (
+                            <span className="text-xs text-gray-400">+{item.tags.length - 3} más</span>
+                          )}
                         </div>
                       )}
                     </div>
