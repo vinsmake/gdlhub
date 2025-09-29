@@ -456,8 +456,8 @@ export default function RestaurantDetail() {
             style={{ width: "max-content" }}
           >
             <div className="bg-white p-3">
-              <div className="relative w-[260px] h-[260px]">
-                <QRCodeCanvas value={restaurantUrl} size={260} />
+              <div className="relative w-[210px] sm:w-[260px] h-[210px] sm:h-[260px]">
+                <QRCodeCanvas value={restaurantUrl} size={window.innerWidth < 640 ? 210 : 260} />
                 <img
                   src="/logo_qr.png"
                   alt="Logo"
@@ -479,7 +479,7 @@ export default function RestaurantDetail() {
             <img
               src={finalImage}
               alt="QR para guardar"
-              className="w-[260px] h-auto mx-auto rounded-xl shadow-md"
+              className="w-[210px] sm:w-[260px] h-auto mx-auto rounded-xl shadow-md"
             />
           </div>
         )}
